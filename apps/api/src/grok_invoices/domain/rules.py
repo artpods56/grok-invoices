@@ -73,3 +73,46 @@ def ensure_posting_allowed(
         raise Conflict(f"Invoice names vehicle {invoice.vehicle_plate}: use a precedent or escalate it")
     if source == "regulation" and not has_open_case:
         raise Conflict("A regulation decision needs an open case: escalate the invoice first")
+
+
+_NIP_WEIGHTS = (6, 5, 7, 2, 3, 4, 5, 6, 7)
+DOCUMENT_BYTE_LIMIT = 1024 * 1024
+
+
+def onboarding_identity(nip: str, company_name: str) -> tuple[str, str]:
+    """The NIP and company name to store. A NIP is 10 digits whose checksum matches.
+
+    The checksum is the weighted sum of the first nine digits, mod 11. Weights are
+    6, 5, 7, 2, 3, 4, 5, 6, 7. A remainder of 10 cannot be a check digit.
+    Spaces and hyphens in the NIP are ignored.
+    """
+    digits = re.sub(r"[\s-]", "", nip.strip())
+    if not re.fullmatch(r"\d{10}", digits):
+        raise Invalid("NIP must be 10 digits")
+    total = sum(int(digit) * weight for digit, weight in zip(digits[:9], _NIP_WEIGHTS, strict=True))
+    checksum = total % 11
+    if checksum == 10 or checksum != int(digits[9]):
+        raise Invalid("NIP checksum is invalid")
+    name = company_name.strip()
+    if not name:
+        raise Invalid("Company name is empty")
+    return digits, name
+
+
+def require_ksef_token(token: str) -> str:
+    """The token to encrypt. Shorter than four characters is refused. Nothing here stores it."""
+    cleaned = token.strip()
+    if len(cleaned) < 4:
+        raise Invalid("KSeF token is too short")
+    return cleaned
+
+
+def client_document(name: str, content_text: str) -> tuple[str, str]:
+    """The document name and text to store. Text over 1 MB is refused."""
+    cleaned = name.strip()
+    if not cleaned:
+        raise Invalid("Document name is empty")
+    size = len(content_text.encode())
+    if size > DOCUMENT_BYTE_LIMIT:
+        raise Invalid(f"Document is {size} bytes. The limit is {DOCUMENT_BYTE_LIMIT} bytes")
+    return cleaned, content_text

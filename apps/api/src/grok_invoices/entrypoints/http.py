@@ -8,6 +8,7 @@ from fastmcp.utilities.lifespan import combine_lifespans
 
 from grok_invoices.domain.errors import Conflict, DomainError, Invalid, KsefUnavailable, NotFound
 from grok_invoices.domain.models import Account, Case, CaseStatus, Event, InvoiceStatus, Posting, Question, QuestionStatus
+from grok_invoices.entrypoints.mcp import client_mcp_app, redact_invite_from_logs
 from grok_invoices.entrypoints.mcp_agents import invoices_app, regulations_app
 from grok_invoices.service_layer import commands, services
 from grok_invoices.service_layer.views import (
@@ -145,6 +146,7 @@ def reset_demo() -> None:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    redact_invite_from_logs()
     settings = get_settings()
     # Failing here makes a deploy without the key roll back instead of exposing writes.
     if settings.release and not settings.platform_api_key:
@@ -156,9 +158,10 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="Grok Invoices",
     version="0.1.0",
-    lifespan=combine_lifespans(lifespan, invoices_app.lifespan, regulations_app.lifespan),
+    lifespan=combine_lifespans(lifespan, client_mcp_app.lifespan, invoices_app.lifespan, regulations_app.lifespan),
 )
 app.include_router(router)
+app.mount("/agents/client", client_mcp_app)
 app.mount("/agents/invoices", invoices_app)
 app.mount("/agents/regulations", regulations_app)
 

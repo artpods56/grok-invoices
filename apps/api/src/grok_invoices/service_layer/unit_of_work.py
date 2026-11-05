@@ -11,7 +11,9 @@ from types import TracebackType
 from typing import Self
 
 from grok_invoices.domain.errors import NotFound
-from grok_invoices.domain.models import Case, Client, Entity, Event, Invoice, Posting, Question
+from grok_invoices.domain.models import (
+    Case, Client, ClientDocument, Entity, Event, Invoice, KsefToken, Posting, Question,
+)
 from grok_invoices.settings import get_settings
 
 STORE_VERSION = 2
@@ -129,6 +131,8 @@ class UnitOfWork:
         self.cases = Repository(self._conn, Case)
         self.questions = Repository(self._conn, Question)
         self.events = Repository(self._conn, Event)
+        self.ksef_tokens = Repository(self._conn, KsefToken)
+        self.documents = Repository(self._conn, ClientDocument)
         return self
 
     def __exit__(
@@ -136,7 +140,7 @@ class UnitOfWork:
     ) -> None:
         try:
             if exc_type is None and self._write:
-                for repository in (self.clients, self.invoices, self.postings, self.cases, self.questions, self.events):
+                for repository in self._repositories():
                     repository.flush()
                 self._conn.execute("COMMIT")
             else:
@@ -152,5 +156,11 @@ class UnitOfWork:
         """Remove all state. Event ids keep counting so a timeline reader's cursor stays valid."""
         self._conn.execute("DELETE FROM entities")
         self._conn.execute("DELETE FROM sequences WHERE kind != ?", (Event.__name__,))
-        for repository in (self.clients, self.invoices, self.postings, self.cases, self.questions, self.events):
+        for repository in self._repositories():
             repository._seen.clear()
+
+    def _repositories(self) -> tuple[Repository[Entity], ...]:
+        return (
+            self.clients, self.invoices, self.postings, self.cases, self.questions, self.events,
+            self.ksef_tokens, self.documents,
+        )

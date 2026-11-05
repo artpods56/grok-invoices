@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     demo_client_phone: str | None = None
     invoice_agent_token: str | None = None
     regulations_agent_token: str | None = None
+    client_invite_token: str | None = None  # MCP invite. Not the platform API key.
+    secret_encryption_key: str | None = None  # Fernet key for the KSeF token.
 
 
 def get_settings() -> Settings:
