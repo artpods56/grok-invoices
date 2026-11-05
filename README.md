@@ -26,7 +26,7 @@ reproducible. uv manages the local `.venv` automatically.
 
 ## Deployment
 
-Every push to `main` deploys to https://grok.51-68-136-107.sslip.io through
+Every push to `main` deploys to https://grok.stackinghq.com through
 `.github/workflows/deploy.yml`. The server builds the release, waits for `/health`
 to pass, and rolls back to the previous release if it fails.
 

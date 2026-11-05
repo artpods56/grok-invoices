@@ -14,7 +14,7 @@ permissions:
 
 env:
   DEPLOY_TARGET: deploy-grok@51.68.136.107
-  PUBLIC_URL: https://grok.51-68-136-107.sslip.io
+  PUBLIC_URL: https://grok.stackinghq.com
 
 jobs:
   deploy:
