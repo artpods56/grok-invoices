@@ -24,6 +24,7 @@ tar --extract --no-same-owner --directory "$release"
 
 echo "==> Building ${sha:0:12}"
 docker build --quiet --tag "grok-invoices:$sha" "$release" </dev/null
+docker build --quiet --tag "grok-invoices-web:$sha" "$release/apps/web" </dev/null
 
 previous=""
 if [[ -L "$ROOT/current" ]]; then
@@ -49,7 +50,7 @@ cd "$ROOT/releases"
 ls -1t | tail -n "+$((KEEP_RELEASES + 1))" | while read -r old; do
   [[ "$old" =~ ^[0-9a-f]{40}$ && "$old" != "$sha" && "$old" != "$previous" ]] || continue
   rm -rf "${ROOT:?}/releases/$old"
-  docker image rm "grok-invoices:$old" >/dev/null 2>&1 || true
+  docker image rm "grok-invoices:$old" "grok-invoices-web:$old" >/dev/null 2>&1 || true
 done
 
 echo "==> Deployed ${sha:0:12}"

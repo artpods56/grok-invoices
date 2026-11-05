@@ -4,7 +4,7 @@ Next.js App Router, React, and Tailwind CSS. The web app runs separately from Fa
 
 ## Local development
 
-Requires Node.js 22 or later. Start FastAPI from the repository root with `uv run uvicorn main:app --reload`. In another terminal:
+Requires Node.js 22 or later. Start FastAPI from the repository root with `uv run uvicorn grok_invoices.entrypoints.http:app --reload`. In another terminal:
 
 ```powershell
 cd apps/web
@@ -29,7 +29,7 @@ docker build -t grok-invoices-web apps/web
 docker run --rm -p 3000:3000 --network YOUR_SHARED_NETWORK -e API_BASE_URL=http://api:8000 grok-invoices-web
 ```
 
-Replace the network and `api:8000` with the actual FastAPI container service and port. The image uses Next.js standalone output, runs as a non-root user, and exposes `/health`. The backend and production reverse proxy are deployed independently. This Dockerfile does not modify the existing production deployment.
+Replace the network and `api:8000` with the actual FastAPI container service and port. The image uses Next.js standalone output, runs as a non-root user, and exposes `/health`. In production, `deploy/deploy.sh` builds this image for every release and `deploy/compose.prod.yaml` runs it on `127.0.0.1:8011`. nginx sends `/` to it and sends `/api`, `/agents`, `/docs`, `/redoc`, `/openapi.json` and `/health` to FastAPI, so the browser reads `/api` from FastAPI directly there and the proxy in this app is only used in development.
 
 ## Data and capabilities
 

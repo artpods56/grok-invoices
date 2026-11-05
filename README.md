@@ -41,6 +41,13 @@ then redeploy. To persist data, write under `DATA_DIR` (`/data`), which survives
 
 Changes to `deploy/` don't apply on push. To apply `compose.prod.yaml` or
 `deploy.sh`, re-run `deploy/install.sh` on the server.
+`install.sh` leaves an existing nginx site alone because certbot has edited it, so
+copy changes to the `location` blocks in `deploy/nginx.conf` into
+`/etc/nginx/sites-available/grok-invoices` by hand.
+
+Each release runs two containers: FastAPI on `127.0.0.1:8010` and the dashboard on
+`127.0.0.1:8011`. nginx sends `/api`, `/agents`, `/docs`, `/redoc`, `/openapi.json`
+and `/health` to FastAPI, and everything else to the dashboard.
 
 ## Platform API
 

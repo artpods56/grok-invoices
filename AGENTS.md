@@ -66,6 +66,7 @@ rolls back to the previous one.
 - The app won't start on the server without `PLATFORM_API_KEY`.
 - Bots authenticate with a token in the URL, so access logs stay off. Don't turn them back on.
 - `deploy/` changes don't apply on push. Someone has to re-run `deploy/install.sh` on the server.
+- `/` serves the dashboard from `apps/web`, in its own container. A new top-level API path must be added to the `location` regex in `deploy/nginx.conf` and on the server, or nginx sends it to the dashboard.
 
 ## Rules for changing the code
 
