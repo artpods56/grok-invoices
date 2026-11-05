@@ -1,0 +1,38 @@
+{
+  "method": "ElevenLabs Scribe transcription of speech nodes; FFmpeg full decode and loudness measurement of final MP4",
+  "transcripts": [
+    {
+      "segment": "hook",
+      "text": "A fuel invoice arrives. Which car was it?"
+    },
+    {
+      "segment": "product",
+      "text": "Grok Invoices. A workspace for Grok Bots."
+    },
+    {
+      "segment": "features",
+      "text": "Track invoices, review decisions, and see where client context is missing."
+    },
+    {
+      "segment": "micro",
+      "text": "Which vehicle was this fuel for? How do you use it for business?"
+    },
+    {
+      "segment": "outro",
+      "text": "Grok Invoices. Context before a decision."
+    }
+  ],
+  "final_video": {
+    "duration_seconds": 23.6,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 708,
+    "bytes": 6607321,
+    "integrated_lufs": -16.06,
+    "true_peak_dbtp": -1.45,
+    "loudness_range_lu": 3
+  },
+  "limits": "Automated transcription is not a subjective listening review. Fixture UI and scripted voices do not demonstrate a live bot conversation.",
+  "api_tests": "60 passed, 1 live test deselected"
+}

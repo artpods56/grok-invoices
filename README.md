@@ -24,6 +24,16 @@ The demo follows a fuel invoice for an unfamiliar vehicle, `GD 9R247`: open a ca
 
 The client talks to a Grok Bot; the dashboard provides supervision. This is a **single-company hackathon demo using KSeF TEST**. The Polish stage demo uses chat and narrates the planned phone interaction. Each bot pass is requested explicitly: saving an answer reopens the platform case, but does not wake another bot. End-to-end Grok Bot, private vault and Pages acceptance remains outstanding in the project notes.
 
+## Watch the demo
+
+https://github.com/user-attachments/assets/b3e78270-5934-4f85-8f45-1fe79905c6b3
+
+Press play to watch here. Turn on sound in the player for the narration and music.
+
+[Play or download the video (MP4, 24 seconds)](https://github.com/artpods56/grok-invoices/raw/refs/heads/preview/narrated-dashboard-demo/brag-output-dashboard-v3/narrated.mp4)
+
+Actual dashboard components with synthetic fixture data. English narration, a distinct client-assistant voice in the micro-demo, and calm instrumental music generated with ElevenLabs. This is a scripted product illustration, not a recording of a live bot conversation or KSeF transaction.
+
 ## A calm view of every case
 
 <p align="center">

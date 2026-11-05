@@ -1,27 +1,31 @@
 # Narrated README demo
 
-Status: script prepared; no ElevenLabs audio generated yet. The current tool session does not expose the configured ElevenLabs MCP. The browser also shows a sign-in page, but the requested workflow is MCP, not browser login.
+Completed on the preview branch with ElevenLabs MCP. The final video is `../narrated.mp4`; the original `../brag.mp4` remains preserved.
 
-## Casting
+## Casting and story
 
-- Narrator: warm, measured, confident adult male English voice; restrained founder-demo delivery. Describes platform functions in third person.
-- Client assistant: distinct adult female English voice, clear and conversational. Speaks directly to the client only in the micro-demo at 13.8 seconds. This is the client-facing assistant relaying a context question, not the narrator or a legal decision-maker.
-- Use available licensed stock voices; no impersonation. Select actual voice IDs from the connected ElevenLabs account before generation. Voice IDs have not been selected yet.
-- Keep English to match the film and repository. The product name is Grok Invoices. No spoken KSeF acronym is needed in these short lines.
-- The spoken question condenses the screen copy; it is a scripted illustration, not audio of a verified live bot.
+George (warm male narrator) describes the platform; Jessica (bright conversational female voice) asks the client a question only in the micro-demo. Stock voice IDs and selected generation IDs are in `generation-manifest.json`. Model: Eleven v4. The question is a scripted illustration, not a recording of a live bot or telephone integration.
 
-## Generation and timing
+The five lines are in `voice-script.json`. Their measured source durations are 3.04, 3.68, 5.04, 4.16 and 3.92 seconds. They start at 0.15, 3.60, 7.55, 13.85 and 19.30 seconds. No voice is sped up or cut. The last complete brand frame at 22.3 seconds holds through the end, giving a total of 23.6 seconds.
 
-Generate the five segments in voice-script.json separately through ElevenLabs MCP. Measure their actual lengths; leave space before each voice change. If a line is too long, shorten the text or extend the shot, rather than rushing or cutting words. Targets are timing windows, not measured speech durations.
+## Music and mix
 
-## Music prompt
+Eleven Music v2 generated a 23-second instrumental ambient technology bed: calm, optimistic, 88 BPM, warm pads, sparse digital plucks, muted pulse and gentle bass. No vocals were requested. The exact prompt remains in the ElevenLabs flow `79ewMAhxZEGXTmBX7Ak1`.
 
-Instrumental ambient technology underscore, calm and optimistic, 88 BPM. Warm soft synthesizer pads, sparse rounded digital plucks, subtle muted pulse, gentle bass. Spacious modern product demo, understated and human. No vocals, no vocal chops, no dramatic rise, no trailer hits, no busy lead melody. Smooth opening, stable middle, soft resolved ending. 23 seconds.
+Speech is normalized to -19 LUFS before the final mix, music to -37 LUFS, with sidechain ducking under voices. A quiet two-note synthetic cue marks the client assistant entrance. Old stock music and card effects are replaced in the narrated cut. Final two-pass normalization targets -16 LUFS and -1 dBTP. The encoded MP4 measures -16.06 LUFS and -1.45 dBTP.
 
-## Mix
+## Reproduction and verification
 
-Keep speech centered and intelligible. Target final mix around -16 LUFS integrated and no higher than -1 dBTP. Start music approximately 20 dB below speech and duck a further 4 dB around spoken phrases; assess by listening. Reduce existing card effects so they do not mask consonants. Add one quiet two-note UI cue before the client assistant enters, distinct from the narrator's scene transitions. Do not apply a telephone band-pass: this is a client-assistant illustration, not proof of a telephone integration.
+From the repository root, with Python and FFmpeg on PATH:
+
+```sh
+python brag-output-dashboard-v3/audio-production/mix.py
+```
+
+This reconstructs the mix from committed source takes, writes `composition/assets/music/narrated-mix.wav` and muxes a new `narrated.mp4`. The HyperFrames composition also references the mixed soundtrack and extended outro. The deterministic mixer preserves the inspected visual master and holds its final frame; a fresh HyperFrames render may continue the subtle background motion during that hold.
+
+Verification: source duration measurements; Scribe readback of all five speech-node transcripts; full final MP4 decode; codec, dimensions, frame count and loudness checks. See `verification.json`. Automated transcription and loudness checks do not constitute a subjective listening review. Scene and final-frame inspection covers visual output. No live KSeF, bot or phone call was exercised.
 
 ## Delivery
 
-Retain the previous video. Export a new narrated MP4 and matching thumbnail, inspect decoded frames, and listen to the complete mix. Only then add a README thumbnail linking to the real committed MP4 or uploaded release asset. Preserve unrelated concurrent README logo edits. Do not publish a placeholder link or claim the audio is already generated.
+README contains a thumbnail and a link to the actual committed MP4 on `preview/narrated-dashboard-demo`. The owner will review and merge. No merge or production deployment is part of this delivery. Signed provider URLs and authentication material are excluded from committed provenance.
