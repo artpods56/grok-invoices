@@ -19,6 +19,6 @@ Initial rows must match the mock: Demo IT Services / 615 / completed / IT servic
 
 `CaseDrawer.jsx` exports named `CaseDrawer` with props `{invoice, onClose, onResolve}`. `invoice` can be null (render nothing). `onResolve(invoiceId, answer)` is called for a valid synthetic answer `{vehicleRegistration, usage, purpose}`; usage is `mixed` or `business`. Parent applies domain transition. Drawer must clearly label any demo-only mutation. Include invoice data, context question and reply form, sources, reasoning and timeline. Responsive and keyboard accessible. Its CSS uses class prefix `case-` and must not restyle the app globally.
 
-Summary cards consume `/assets/summary-completed.png`, `/assets/summary-waiting.png`, `/assets/summary-blocked.png`. Use `/assets/icon.svg` for supplied GI branding. Keep whitespace and composition faithful, with responsive mobile navigation and horizontally scrollable table if needed.
+Summary cards consume `/assets/summary-completed.png`, `/assets/summary-waiting.png`, `/assets/summary-blocked.png`. Use `/assets/logo-v2.png` for the current pastel folded-G brand mark. Keep whitespace and composition faithful, with responsive mobile navigation and horizontally scrollable table if needed.
 
 Every worker is part of a team; never revert others' work. Commit only owned files with short English messages. Do not modify Outline or root shared documentation; the parent synchronizes them.

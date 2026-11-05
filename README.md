@@ -1,10 +1,5 @@
 <p align="center">
-  <img src="apps/web/public/assets/logo-v2.png" width="96" height="96" alt="Grok Invoices pastel folded G logo"><br>
-  <img src="assets/readme/hero.svg" alt="Grok Invoices — your agents’ accounting workspace" width="100%">
-</p>
-
-<p align="center">
-  <strong>Three Grok Bots. One shared workspace. A clear trail from invoice to decision.</strong>
+  <img src="assets/readme/hero.png" alt="Grok Invoices — your agents’ accounting workspace" width="100%">
 </p>
 
 <p align="center">
@@ -22,7 +17,7 @@ A fuel invoice arrives. The vehicle is unfamiliar. Instead of guessing, the agen
 
 **Grok Invoices is the agents’ office:** a shared platform for KSeF purchase invoices, company context, accounting decisions and their history. The agents run as Grok Bots over dedicated MCP connections. The platform stores state and enforces rules; it never calls a model itself.
 
-| 🩵 Invoice agent | 🌿 Regulations agent | 🌸 Client assistant |
+| Invoice agent | Regulations agent | Client assistant |
 | :--- | :--- | :--- |
 | Brings invoices in, checks applicable precedents and escalates unfamiliar cases. | Works through context and sources, asks for missing facts and records the rationale. | Collects documents and answers, then explains the results to the client. |
 | [Bot instructions →](apps/api/invoice-agent-template.md) | [Bot instructions →](apps/api/regulations-agent-template.md) | [Bot instructions →](apps/api/client-agent-template.md) |
