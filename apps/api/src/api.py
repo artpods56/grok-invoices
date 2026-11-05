@@ -3,9 +3,9 @@ import os
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 
-from app import seed, store
-from app.db import read, transaction
-from app.schemas import (
+from apps.api.src import seed, store
+from apps.api.src.db import read, transaction
+from apps.api.src.schemas import (
     Account, AnswerIn, Case, CaseDetail, CaseStatus, Client, CorrectionIn, EscalationIn, Event, FactIn, Invoice,
     InvoiceDetail, InvoiceIn, InvoiceStatus, Posting, PostingIn, PrecedentMatch, Question, QuestionIn, QuestionStatus,
     VehicleIn,

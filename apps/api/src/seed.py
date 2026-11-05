@@ -6,9 +6,9 @@ from decimal import Decimal
 
 from fastapi import HTTPException
 
-from app import store
-from app.db import TABLES
-from app.schemas import InvoiceIn
+from apps.api.src import store
+from apps.api.src.db import TABLES
+from apps.api.src.schemas import InvoiceIn
 
 COMPANY_VAN = "DW1234A"
 UNKNOWN_CAR = "DW9876C"
