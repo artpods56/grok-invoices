@@ -26,7 +26,9 @@ The client talks to a Grok Bot; the dashboard provides supervision. This is a **
 
 ## Watch the demo
 
-[![Watch the narrated Grok Invoices demo](brag-output-dashboard-v3/brag.jpg)](brag-output-dashboard-v3/narrated.mp4)
+https://github.com/user-attachments/assets/b3e78270-5934-4f85-8f45-1fe79905c6b3
+
+Press play to watch here. Turn on sound in the player for the narration and music.
 
 [Play or download the video (MP4, 24 seconds)](https://github.com/artpods56/grok-invoices/raw/refs/heads/preview/narrated-dashboard-demo/brag-output-dashboard-v3/narrated.mp4)
 
