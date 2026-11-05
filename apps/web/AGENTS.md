@@ -10,7 +10,7 @@ The owner selected Next.js App Router and Tailwind CSS, running in a separate we
 
 The outer page background behind the dashboard window uses a soft pastel gradient inspired by the summary cards: cyan, blue, lilac, pink, and peach (owner feedback, 2026-11-05).
 
-Use the shared FastAPI platform as the source of truth. `API_BASE_URL` is server-only runtime configuration. Never put platform credentials in browser code. The dashboard proxy exposes public reads only; synthetic walkthrough state must be explicitly selected and labelled.
+Use the shared FastAPI platform as the source of truth. `API_BASE_URL` is server-only runtime configuration. Never put platform credentials in browser code. The dashboard proxy exposes public reads only.
 
 Run `npm test` and `npm run build` before committing a completed feature. Check desktop and mobile behavior in the browser. A container build must be reported separately from a Next.js build.
 

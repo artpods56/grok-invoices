@@ -6,6 +6,13 @@ const roles = [
   ['Client agent', 'client_agent', 'Client answers and context'],
 ];
 
+function conditionsLabel(conditions) {
+  const parts = [];
+  if (conditions?.vehicle_usage) parts.push(`vehicle usage ${conditions.vehicle_usage}`);
+  if (conditions?.vehicle_plate) parts.push(`vehicle ${conditions.vehicle_plate}`);
+  return parts.length ? `Applies when: ${parts.join(', ')}` : 'No conditions';
+}
+
 export function PlatformSections({ page, invoices, snapshot, onInspect }) {
   const inspect = invoice => <button className="text-button" onClick={() => onInspect(invoice.id)}>Inspect {invoice.id} →</button>;
   const questions = invoices.flatMap(invoice => invoice.questions.map(question => ({ invoice, question })));
@@ -38,10 +45,34 @@ export function PlatformSections({ page, invoices, snapshot, onInspect }) {
       {!events.length && <p className="panel-empty">No events in this window.</p>}
     </>;
   }
-  if (['Sources', 'Precedents', 'Decisions'].includes(page)) return <>
-    <p className="panel-note">{page === 'Decisions' ? 'Inspect an invoice for recorded postings and rationale.' : page === 'Sources' ? 'The invoice list does not include legal bases. Inspect invoice postings to read the recorded source and legal basis.' : 'The invoice list does not include precedent details. Inspect invoice postings for recorded precedent references.'} No applicability or legal verification is implied.</p>
-    {invoices.map(invoice => <article className="detail-row" key={invoice.id}><div><h3>{invoice.supplier}</h3><p>{STATUS_LABELS[invoice.status]} · {invoice.context}</p>{invoice.cases.map(item => <p key={item.id}>Case #{item.id} · {item.status}: {item.reason}</p>)}</div>{inspect(invoice)}</article>)}
-    {!invoices.length && <p className="panel-empty">No invoices in these results.</p>}
+  const invoiceById = new Map(invoices.map(invoice => [invoice.apiId, invoice]));
+  const postings = (snapshot?.postings ?? []).filter(posting => invoiceById.has(posting.invoice_id));
+  const treatment = posting => `Account ${posting.account} · ${posting.vat_deduction_percent}% VAT deduction (PLN ${posting.deductible_vat})`;
+  const about = posting => `${invoiceById.get(posting.invoice_id).supplier} · ${invoiceById.get(posting.invoice_id).context}`;
+  if (page === 'Decisions') return <>
+    {postings.map(posting => <article className="detail-row" key={posting.id}>
+      <div><h3>{treatment(posting)}</h3><p>{about(posting)}</p><p>{posting.rationale}</p><p className="muted">{posting.source} · {posting.actor} · {posting.status}{posting.legal_basis ? ` · ${posting.legal_basis}` : ''}</p></div>{inspect(invoiceById.get(posting.invoice_id))}
+    </article>)}
+    {!postings.length && <p className="panel-empty">No decisions recorded in these results.</p>}
   </>;
+  if (page === 'Precedents') {
+    const precedents = postings.filter(posting => posting.reusable === true && posting.status === 'active');
+    return <>
+      {precedents.map(posting => <article className="detail-row" key={posting.id}>
+        <div><h3>Precedent #{posting.id}: {treatment(posting)}</h3><p>{about(posting)}</p><p>{posting.rationale}</p><p className="muted">{conditionsLabel(posting.conditions)}</p></div>{inspect(invoiceById.get(posting.invoice_id))}
+      </article>)}
+      {!precedents.length && <p className="panel-empty">No precedents recorded in these results.</p>}
+    </>;
+  }
+  if (page === 'Sources') {
+    const cited = [...new Set(postings.map(posting => posting.legal_basis).filter(Boolean))];
+    return <>
+      <p className="panel-note">Legal bases cited in recorded decisions. The platform stores these as written and does not validate them.</p>
+      {cited.map(basis => <article className="detail-row" key={basis}>
+        <div><h3>{basis}</h3><p>Cited by {postings.filter(posting => posting.legal_basis === basis).map(posting => `decision #${posting.id}`).join(', ')}</p></div>
+      </article>)}
+      {!cited.length && <p className="panel-empty">No legal bases cited in these results.</p>}
+    </>;
+  }
   return null;
 }

@@ -59,7 +59,7 @@ on the server; locally, leave it unset to skip the check.
 
 - `POST /api/demo/issue-fuel-invoice` issues the stage demo's invoice on KSeF TEST.
 - `POST /api/ksef/sync?source=test` fetches new invoices from KSeF TEST.
-- `POST /api/ksef/sync` loads three fixture invoices, as a fallback if KSeF TEST is down.
+- `POST /api/ksef/sync?source=fixtures` loads three sample invoices only where `SAMPLE_DATA=true`. Production has no sample data.
 - `POST /api/demo/reset` restores the seed so the demo can run again.
 
 Bumping `STORE_VERSION` in `unit_of_work.py` rebuilds the database from the seed on the next
@@ -95,7 +95,7 @@ Repository content and commit messages are written in English. Commit messages s
 
 ## Dashboard development
 
-The dashboard is a Next.js + Tailwind app in `apps/web/`, deployed in its own container beside FastAPI. It reads platform records through a server-side GET proxy and provides an explicitly selected synthetic walkthrough. See [web setup and container configuration](apps/web/README.md).
+The dashboard is a Next.js + Tailwind app in `apps/web/`, deployed in its own container beside FastAPI. It reads platform records through a server-side GET proxy. See [web setup and container configuration](apps/web/README.md).
 
 Requires Node.js 22 or later and npm. From the repository root:
 
@@ -105,4 +105,4 @@ npm ci
 npm run dev -- --hostname 127.0.0.1 --port 4173
 ```
 
-Open http://localhost:4173. Stop the server with Ctrl+C. Run `npm test` for domain, adapter and proxy tests, and `npm run build` for the production bundle. The synthetic demo state resets on page reload. `API_BASE_URL` defaults to the local FastAPI server at port 8000 and can be changed at runtime for a container network.
+Open http://localhost:4173. Stop the server with Ctrl+C. Run `npm test` for domain, adapter and proxy tests, and `npm run build` for the production bundle. `API_BASE_URL` defaults to the local FastAPI server at port 8000 and can be changed at runtime for a container network.

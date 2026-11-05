@@ -48,7 +48,7 @@ async def exercise(url, key, tokens):
     from grok_invoices.seed import COMPANY_VAN, UNKNOWN_CAR, _fuel
 
     async with httpx.AsyncClient(headers={"Authorization": f"Bearer {key}"}, timeout=30, trust_env=False) as http:
-        synced = await http.post(f"{url}/api/ksef/sync")
+        synced = await http.post(f"{url}/api/ksef/sync", params={"source": "fixtures"})
         synced.raise_for_status()
     async with AsyncExitStack() as stack:
         invoice = await connect(stack, url, "invoices", tokens["INVOICE_AGENT_TOKEN"])

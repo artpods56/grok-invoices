@@ -12,7 +12,7 @@ from grok_invoices.service_layer import services
 
 def synced(api):
     """Returns the IT, matching-fuel and unknown-car invoices, in demo order."""
-    invoices = api.post("/api/ksef/sync").json()
+    invoices = api.post("/api/ksef/sync", params={"source": "fixtures"}).json()
     assert len(invoices) == 3
     return invoices
 
@@ -51,7 +51,7 @@ def test_invoice_fields_come_from_the_parsed_ksef_document(api):
 
 def test_ksef_sync_adds_nothing_the_second_time(api):
     synced(api)
-    assert api.post("/api/ksef/sync").json() == []
+    assert api.post("/api/ksef/sync", params={"source": "fixtures"}).json() == []
 
 
 def test_full_demo_scenario(api):
@@ -198,8 +198,8 @@ def test_unknown_fields_are_rejected_so_agent_mistakes_surface(api):
 
 
 def test_writes_need_the_key_and_reads_do_not(api):
-    assert api.post("/api/ksef/sync", headers={"Authorization": ""}).status_code == 401
-    assert api.post("/api/ksef/sync", headers={"Authorization": "Bearer wrong"}).status_code == 401
+    assert api.post("/api/ksef/sync", params={"source": "fixtures"}, headers={"Authorization": ""}).status_code == 401
+    assert api.post("/api/ksef/sync", params={"source": "fixtures"}, headers={"Authorization": "Bearer wrong"}).status_code == 401
     assert api.get("/api/invoices", headers={"Authorization": ""}).status_code == 200
 
 
@@ -235,3 +235,17 @@ def test_deployed_app_refuses_to_start_without_a_key(monkeypatch):
     with pytest.raises(RuntimeError, match="PLATFORM_API_KEY"):
         with TestClient(app):
             pass
+
+
+def test_without_sample_data_the_platform_holds_only_the_ksef_test_client(monkeypatch):
+    monkeypatch.setenv("SAMPLE_DATA", "false")
+    from grok_invoices.entrypoints.http import app
+
+    with TestClient(app, headers={"Authorization": "Bearer test-key"}) as client:
+        profile = client.get("/api/client").json()
+        assert profile["nip"] == "6421983078"
+        assert UNKNOWN_CAR not in [vehicle["plate"] for vehicle in profile["fleet"]]
+        assert client.get("/api/invoices").json() == []
+        assert client.post("/api/ksef/sync", params={"source": "fixtures"}).status_code == 422
+        assert client.post("/api/demo/reset").status_code == 204
+        assert client.get("/api/invoices").json() == []

@@ -1,6 +1,9 @@
-"""Demo data, built as real FA(3) through ksef2 so fixtures and live KSeF share one code path."""
+"""Starting data. Deployed, it's only the KSeF TEST client: every invoice comes from KSeF TEST.
 
-from datetime import date, datetime
+Sample invoices and their precedent exist only with SAMPLE_DATA set, for tests and local smoke runs.
+"""
+
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from grok_invoices.domain.models import (
@@ -15,6 +18,11 @@ CLIENT_NAME = "Demo Logistyka sp. z o.o."
 COMPANY_VAN = "DW 1234A"
 UNKNOWN_CAR = "GD 9R247"  # The stage demo depends on this plate staying off the fleet.
 IT_SELLER_NIP = "8992736457"
+
+KSEF_TEST_CLIENT_NIP = "6421983078"
+KSEF_TEST_CLIENT_NAME = "Cisowa Logistyka Sp. z o.o."
+# Earlier than the stage invoice, which was issued on 2026-11-05 before this seed existed.
+KSEF_TEST_SINCE = datetime(2026, 11, 1, tzinfo=UTC)
 
 
 def _fuel(number: str, issued: date, plate: str, litres: str) -> bytes:
@@ -40,6 +48,30 @@ def fixture_inbox() -> list[ReceivedDocument]:
 
 
 def populate(uow: UnitOfWork, now: datetime) -> None:
+    if get_settings().sample_data:
+        _populate_sample(uow, now)
+        return
+    uow.clients.add(Client(
+        name=KSEF_TEST_CLIENT_NAME,
+        nip=KSEF_TEST_CLIENT_NIP,
+        phone=get_settings().demo_client_phone,
+        ksef_since=KSEF_TEST_SINCE,
+        fleet=[
+            Vehicle(plate="DW 7KL34", model="Volkswagen Transporter 6.1", usage="mixed"),
+            Vehicle(plate="DW 4HS81", model="MAN TGL 12.220", usage="company"),
+            Vehicle(plate="DW 9CK22", model="Ford Transit Custom", usage="mixed"),
+        ],
+        accounts=[
+            Account(code="402", name="Usługi obce"),
+            Account(code="403", name="Paliwo i eksploatacja pojazdów"),
+            Account(code="403-01", name="Paliwo — pojazdy mieszane"),
+            Account(code="403-02", name="Paliwo — pojazdy ciężarowe"),
+        ],
+    ))
+    uow.events.add(Event(at=now, actor="system", type="demo_reset", summary="Platforma gotowa: klient KSeF TEST bez faktur"))
+
+
+def _populate_sample(uow: UnitOfWork, now: datetime) -> None:
     uow.clients.add(Client(
         name=CLIENT_NAME,
         nip=CLIENT_NIP,

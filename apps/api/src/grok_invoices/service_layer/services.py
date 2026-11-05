@@ -9,7 +9,7 @@ from typing import Literal
 
 from grok_invoices import ksef, legal_sources, seed
 from grok_invoices.domain import regulations, rules
-from grok_invoices.domain.errors import Conflict
+from grok_invoices.domain.errors import Conflict, Invalid
 from grok_invoices.domain.models import (
     Account, Actor, Case, ClientDocument, Event, EventType, Fact, Invoice, KsefToken, Posting, Question,
     QuestionStatus, ReceivedDocument, Vehicle,
@@ -19,6 +19,7 @@ from grok_invoices.service_layer.commands import (
 )
 from grok_invoices.service_layer.secrets import decrypt_secret, encrypt_secret
 from grok_invoices.service_layer.unit_of_work import UnitOfWork, init_store
+from grok_invoices.settings import get_settings
 from grok_invoices.service_layer.views import (
     CaseDetail, ClientProfile, ClientStatus, DocumentContent, InvoiceDetail, InvoiceSummary, IssuedInvoice, KsefConfigured,
     OpenQuestion, PrecedentMatch, StoredDocument,
@@ -218,6 +219,8 @@ def ingest_documents(documents: Iterable[ReceivedDocument]) -> list[InvoiceSumma
 def sync_ksef(source: KsefSource = "fixtures") -> list[InvoiceSummary]:
     """Fetch new purchase invoices from KSeF TEST or the fixtures."""
     if source == "fixtures":
+        if not get_settings().sample_data:
+            raise Invalid("Sample invoices are off here. Use source=test to fetch from KSeF TEST.")
         return ingest_documents(seed.fixture_inbox())
     with UnitOfWork(write=False) as uow:
         client = uow.client

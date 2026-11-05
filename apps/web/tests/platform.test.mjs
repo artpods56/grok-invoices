@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadPlatformSnapshot, loadPlatformInvoice } from '../src/platform.js';
+import { loadPlatformPostings, loadPlatformSnapshot, loadPlatformInvoice } from '../src/platform.js';
 
 const invoice = (id = 1, status = 'received') => ({
   id, status, seller_name: 'Demo Fuel Station', seller_nip: '1234567890',
@@ -151,4 +151,17 @@ test('detail rejects invalid IDs before fetching, wrong relations and failed cas
     mockFetch(t, { '/api/invoices/1': { ...invoice(), cases: [caseRow()], postings: [] }, '/api/events': [], '/api/cases/10': { ...caseRow(), invoice: invoice(), questions: [question(20, 99)] } });
     await assert.rejects(loadPlatformInvoice(1), /question relation mismatch/);
   });
+});
+
+test('postings for decisions and precedents come from each invoice detail and are validated', async () => {
+  const posting = { id: 7, invoice_id: 2, account: '403', rationale: 'Mixed use', actor: 'accountant', created_at: '2026-11-05T10:00:00Z', status: 'active', source: 'accountant', deductible_vat: '40.25', vat_deduction_percent: 50, legal_basis: null, reusable: true };
+  const original = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async url => { calls.push(url); return Response.json({ postings: [posting] }); };
+  try {
+    assert.deepEqual(await loadPlatformPostings([{ apiId: 2 }]), [posting]);
+    assert.deepEqual(calls, ['/api/invoices/2']);
+    globalThis.fetch = async () => Response.json({ postings: [{ ...posting, source: 'guess' }] });
+    await assert.rejects(loadPlatformPostings([{ apiId: 2 }]), /posting source/);
+  } finally { globalThis.fetch = original; }
 });

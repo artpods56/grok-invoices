@@ -8,6 +8,7 @@ KEY = "test-key"
 def isolated_platform(tmp_path, monkeypatch):
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("PLATFORM_API_KEY", KEY)
+    monkeypatch.setenv("SAMPLE_DATA", "true")
     monkeypatch.delenv("RELEASE", raising=False)
 
 

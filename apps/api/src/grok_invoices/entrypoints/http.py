@@ -127,8 +127,8 @@ def list_events(after: int = Query(default=0, ge=0), limit: int = Query(default=
 
 
 @router.post("/ksef/sync", response_model=list[InvoiceSummary], tags=["invoices"])
-def sync_ksef(source: services.KsefSource = "fixtures"):
-    """Fetch new purchase invoices from KSeF TEST (`source=test`) or the local fixtures."""
+def sync_ksef(source: services.KsefSource = "test"):
+    """Fetch new purchase invoices from KSeF TEST, or the sample fixtures where SAMPLE_DATA is set."""
     return services.sync_ksef(source)
 
 

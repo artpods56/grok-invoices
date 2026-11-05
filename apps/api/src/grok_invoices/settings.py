@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     data_dir: Path = Path(".data")
     release: str | None = None  # Only set on the server.
+    sample_data: bool = False  # Sample invoices for tests and local smoke runs. Never on the server.
     platform_api_key: str | None = None
     demo_client_phone: str | None = None
     invoice_agent_token: str | None = None
