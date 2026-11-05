@@ -2,7 +2,7 @@
 
 # Grok Invoices
 
-A simple FastAPI application managed with uv and Python 3.13.
+Grok Invoices: first of its kind Agent as a Service. A platform where agents book purchase invoices from KSeF and an accountant supervises.
 
 ## Run locally
 
@@ -10,19 +10,11 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run:
 
 ```sh
 uv sync --locked
-uv run uvicorn main:app --reload
+uv run uvicorn grok_invoices.entrypoints.http:app --reload
 ```
 
-The server runs at http://127.0.0.1:8000.
-
-- `GET /` returns a welcome message.
-- `GET /health` returns `{"status": "ok"}`.
-- `/docs` provides interactive API documentation.
-- `/redoc` provides alternative API documentation.
-- `/openapi.json` provides the API schema.
-
-Add dependencies with `uv add <package>`. Commit `uv.lock` to keep installations
-reproducible. uv manages the local `.venv` automatically.
+The server runs at http://127.0.0.1:8000, with interactive API docs at `/docs`.
+See [AGENTS.md](AGENTS.md) for the architecture and conventions.
 
 ## Deployment
 
@@ -39,13 +31,15 @@ Changes to `deploy/` don't apply on push. To apply `compose.prod.yaml` or
 ## Platform API
 
 The shared state agents work through lives under `/api`. The contract is at
-[`/docs`](https://grok.stackinghq.com/docs) and `/openapi.json`. Run the tests with `uv run pytest`.
+[`/docs`](https://grok.stackinghq.com/docs) and `/openapi.json`.
 
 Writes need `Authorization: Bearer $PLATFORM_API_KEY`. The key is in `/srv/grok-invoices/.env`
 on the server; locally, leave it unset to skip the check.
 
-- `POST /api/ksef/sync` loads the three demo invoices (mock KSeF).
+- `POST /api/demo/issue-fuel-invoice` issues the stage demo's invoice on KSeF TEST.
+- `POST /api/ksef/sync?source=test` fetches new invoices from KSeF TEST.
+- `POST /api/ksef/sync` loads three fixture invoices, as a fallback if KSeF TEST is down.
 - `POST /api/demo/reset` restores the seed so the demo can run again.
 
-A schema change in `apps/api/src/db.py` rebuilds the database from the seed on the next start,
-which discards existing data.
+Bumping `STORE_VERSION` in `unit_of_work.py` rebuilds the database from the seed on the next
+start, which discards existing data.
