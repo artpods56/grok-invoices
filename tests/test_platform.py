@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.seed import COMPANY_VAN, UNKNOWN_CAR
+from apps.api.src.seed import COMPANY_VAN, UNKNOWN_CAR
 
 KEY = "test-key"
 AUTH = {"Authorization": f"Bearer {KEY}"}

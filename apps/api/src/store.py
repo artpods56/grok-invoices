@@ -9,7 +9,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from app.schemas import AnswerIn, CorrectionIn, EscalationIn, FactIn, InvoiceIn, PostingIn, QuestionIn, VehicleIn
+from apps.api.src.schemas import AnswerIn, CorrectionIn, EscalationIn, FactIn, InvoiceIn, PostingIn, QuestionIn, VehicleIn
 
 
 def _now() -> str:

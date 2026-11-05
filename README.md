@@ -47,5 +47,5 @@ on the server; locally, leave it unset to skip the check.
 - `POST /api/ksef/sync` loads the three demo invoices (mock KSeF).
 - `POST /api/demo/reset` restores the seed so the demo can run again.
 
-A schema change in `app/db.py` rebuilds the database from the seed on the next start,
+A schema change in `apps/api/src/db.py` rebuilds the database from the seed on the next start,
 which discards existing data.

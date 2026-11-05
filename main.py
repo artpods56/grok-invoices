@@ -4,9 +4,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api import router
-from app.db import init_db, transaction
-from app.seed import seed_if_empty
+from apps.api.src.api import router
+from apps.api.src.db import init_db, transaction
+from apps.api.src.seed import seed_if_empty
 
 
 @asynccontextmanager
