@@ -28,6 +28,7 @@ EventType = Literal[
     "demo_reset", "invoice_received", "invoice_posted", "precedent_created", "posting_corrected",
     "case_opened", "case_taken_over", "question_asked", "question_answered",
     "client_fact_added", "vehicle_saved",
+    "onboarding_started", "ksef_token_configured", "document_submitted",
 ]
 
 VEHICLE_PLATE_KEY = "NrRej"
@@ -258,6 +259,7 @@ class Client(Entity):
     nip: str
     phone: str | None = None
     ksef_since: datetime  # Invoices stored in KSeF before this aren't fetched.
+    onboarded_at: datetime | None = None  # Set when the client agent registers the company.
     fleet: list[Vehicle] = Field(default_factory=list)
     facts: list[Fact] = Field(default_factory=list)
     accounts: list[Account] = Field(default_factory=list)
@@ -276,6 +278,22 @@ class Client(Entity):
     def require_account(self, code: str) -> None:
         if not any(account.code == code for account in self.accounts):
             raise Invalid(f"Account {code} is not in the chart of accounts")
+
+
+class KsefToken(Entity):
+    """The client's KSeF token, encrypted. No view or route returns this entity."""
+
+    ciphertext: str
+    last_four: str
+    configured_at: datetime
+
+
+class ClientDocument(Entity):
+    """A document the client gave the agent. No route returns its content."""
+
+    name: str
+    content_text: str
+    created_at: datetime
 
 
 class Event(Entity):
