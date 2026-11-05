@@ -1,7 +1,7 @@
-# Resume after MCP refresh
+# Narrated preview ready
 
-The user added ElevenLabs MCP and says the thread must refresh before its tools appear. Re-discover tools in the next turn; do not ask for browser login. Audio remains ungenerated.
+The narrated deliverable is `narrated.mp4` (23.6 seconds, 1080p, 30 fps). README links to the video on `preview/narrated-dashboard-demo`. The owner will review and merge; this change must not be pushed to main.
 
-Use this directory as the visual source. Latest logo and real dashboard DOM/CSS replace the older synthetic UI. Original source commit a5b501f. See VISUAL-REVISION.md for fixture data and browser transport provenance.
+ElevenLabs MCP generated George narration, Jessica client-assistant speech and an instrumental technology bed. `audio-production/generation-manifest.json` records the selected assets without signed download URLs. Rebuild with `python brag-output-dashboard-v3/audio-production/mix.py` from the repository root. The existing `brag.mp4` remains the visual master.
 
-Next: generate narrator and distinct client-assistant lines in audio-production/voice-script.json via ElevenLabs; update wording to match the new title and question; generate calm tech underscore; mix and listen; render a final narrated version. Put its real thumbnail/video link in README while preserving unrelated updates. Current visual revision retains the original music only. No fabricated voice IDs or generated audio claims.
+Actual dashboard DOM/CSS and synthetic fixture provenance are documented in VISUAL-REVISION.md. This is not a live bot or telephone recording.
