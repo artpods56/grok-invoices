@@ -8,6 +8,7 @@ The hackathon workflow connects invoice intake, company context, regulatory rese
 
 ## Project notes
 
+- [Dashboard visual direction](docs/design/dashboard-direction.md)
 - [Current context and demo scope](docs/project-context.md)
 - [Polish accounting workflow and official sources](docs/research/polish-accounting-and-sources.md)
 - [Keeping an AI agent's regulatory knowledge current](docs/research/ai-regulatory-knowledge.md)
