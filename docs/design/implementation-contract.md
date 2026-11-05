@@ -1,12 +1,12 @@
 # Dashboard implementation contract
 
-Target: `assets/design/dashboard-f-mockup.png`. Build the interactive inspection dashboard in `dashboard/` using React/Vite, Inter, and Phosphor regular icons. English UI. Synthetic demo only; no live KSeF, phone, or tax execution.
+Target: `assets/design/dashboard-f-mockup.png`. Build the interactive inspection dashboard in `apps/web/` using React/Vite, Inter, and Phosphor regular icons. English UI. Synthetic demo only; no live KSeF, phone, or tax execution.
 
 ## Module boundaries
 
-- UI shell owner: `dashboard/src/App.jsx`, `dashboard/src/styles.css`, `dashboard/index.html`. Own navigation, summaries, filters/search, selection, CSV export and overlays. Import domain and case details modules using the contract below.
-- Domain owner: `dashboard/src/domain.js`, `dashboard/src/CaseDrawer.jsx`, `dashboard/src/case-drawer.css`, `dashboard/tests/domain.test.mjs`. Own fixtures, pure transitions, and case details UI. Do not edit App, global styles, package files, or the visual assets.
-- Asset owner: `dashboard/public/assets/summary-completed.png`, `summary-waiting.png`, `summary-blocked.png`, and `docs/design/asset-provenance.md`. Use ImageGen for three pastel backgrounds with no text or icons; use source mock as reference. Supplied logo is copied by parent.
+- UI shell owner: `apps/web/src/App.jsx`, `apps/web/src/styles.css`, `apps/web/index.html`. Own navigation, summaries, filters/search, selection, CSV export and overlays. Import domain and case details modules using the contract below.
+- Domain owner: `apps/web/src/domain.js`, `apps/web/src/CaseDrawer.jsx`, `apps/web/src/case-drawer.css`, `apps/web/tests/domain.test.mjs`. Own fixtures, pure transitions, and case details UI. Do not edit App, global styles, package files, or the visual assets.
+- Asset owner: `apps/web/public/assets/summary-completed.png`, `summary-waiting.png`, `summary-blocked.png`, and `docs/design/asset-provenance.md`. Use ImageGen for three pastel backgrounds with no text or icons; use source mock as reference. Supplied logo is copied by parent.
 - Parent owns integration, build config, documentation, Outline and final browser QA.
 
 ## Domain API

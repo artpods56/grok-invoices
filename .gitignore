@@ -1,6 +1,16 @@
+<<<<<<< HEAD
 node_modules/
 dist/
 .env
 .env.*
 !.env.example
 *.log
+=======
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.DS_Store
+.data/
+.pytest_cache/
+>>>>>>> origin/main

@@ -14,13 +14,13 @@ The generated originals are preserved at their default local paths below. Projec
 
 | Asset | Pixel dimensions | SHA-256 |
 | --- | --- | --- |
-| `dashboard/public/assets/summary-completed.png` | 2041x770 | `e1bbcf4963ec622e9cbcd7bb88af80397ebd200b5a8e212cc4bdb6d81e892811` |
-| `dashboard/public/assets/summary-waiting.png` | 2033x774 | `8cbc7451f8e666c331571aa38ae1c56265ddf4a9c17a1a378560cb0e1bcff79c` |
-| `dashboard/public/assets/summary-blocked.png` | 2038x771 | `2c7a262088c485f2003bf970d305e15d526ca363760300a55bb4aa57d701202a` |
+| `apps/web/public/assets/summary-completed.png` | 2041x770 | `e1bbcf4963ec622e9cbcd7bb88af80397ebd200b5a8e212cc4bdb6d81e892811` |
+| `apps/web/public/assets/summary-waiting.png` | 2033x774 | `8cbc7451f8e666c331571aa38ae1c56265ddf4a9c17a1a378560cb0e1bcff79c` |
+| `apps/web/public/assets/summary-blocked.png` | 2038x771 | `2c7a262088c485f2003bf970d305e15d526ca363760300a55bb4aa57d701202a` |
 
 ### Completed
 
-Project path: `dashboard/public/assets/summary-completed.png`.
+Project path: `apps/web/public/assets/summary-completed.png`.
 
 Preserved original: `C:/Users/Admin/.codex/generated_images/01a1ad04-7db3-7480-98ba-6104836ec86e/exec-cada7e57-920a-4d0c-a041-6f340cf894d2.png`.
 
@@ -32,7 +32,7 @@ Use case: stylized-concept. Asset type: background-only PNG artwork for a dashbo
 
 ### Waiting for client
 
-Project path: `dashboard/public/assets/summary-waiting.png`.
+Project path: `apps/web/public/assets/summary-waiting.png`.
 
 Preserved original: `C:/Users/Admin/.codex/generated_images/01a1ad04-7db3-7480-98ba-6104836ec86e/exec-5c811d01-1f71-47de-a2f9-cbafc0e3cb5b.png`.
 
@@ -44,7 +44,7 @@ Use case: stylized-concept. Asset type: background-only PNG artwork for a dashbo
 
 ### Blocked
 
-Project path: `dashboard/public/assets/summary-blocked.png`.
+Project path: `apps/web/public/assets/summary-blocked.png`.
 
 Preserved original: `C:/Users/Admin/.codex/generated_images/01a1ad04-7db3-7480-98ba-6104836ec86e/exec-2054e5a3-73f1-445d-86ee-2214651d8293.png`.
 
