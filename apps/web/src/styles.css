@@ -1,7 +1,13 @@
 :root {
   font-family: 'Inter', sans-serif;
   color: #171819;
-  background: #eceeed;
+  background:
+    radial-gradient(ellipse at 8% 12%, #9ee9f3 0%, transparent 48%),
+    radial-gradient(ellipse at 84% 8%, #b4caff 0%, transparent 48%),
+    radial-gradient(ellipse at 96% 68%, #ffd7b0 0%, transparent 50%),
+    radial-gradient(ellipse at 16% 92%, #e9bcea 0%, transparent 52%),
+    #f6f3ef;
+  background-attachment: fixed;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   font-weight: 400;
