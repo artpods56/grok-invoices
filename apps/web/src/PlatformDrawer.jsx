@@ -67,7 +67,7 @@ function PlatformDetails({ invoice, onClose }) {
         <button type="button" ref={closeButton} onClick={onClose} aria-label="Close platform invoice details">Close <span aria-hidden="true">×</span></button>
       </header>
       <div className="platform-content">
-        <p className="platform-notice" id={`${titleId}-notice`}>Mock-backed platform demo. This view reads server records; it does not connect to live KSeF or submit changes.</p>
+        <p className="platform-notice" id={`${titleId}-notice`}>Read only. Demo company records from the platform; changes go through the agents or the API.</p>
         {!detail && !error && <p role="status">Loading platform invoice…</p>}
         {error && <div><p className="platform-error" role="alert">{error}</p><button type="button" onClick={() => setAttempt(value => value + 1)}>Retry loading</button></div>}
         {detail && <>

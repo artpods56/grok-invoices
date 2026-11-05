@@ -121,6 +121,16 @@ export async function loadPlatformSnapshot({ signal } = {}) {
   return { invoices: invoices.map(row => normalize(row, cases, questions)), client, events };
 }
 
+// The API has no list of postings, so decisions and precedents come from each invoice's detail.
+export async function loadPlatformPostings(invoices, { signal } = {}) {
+  const details = await Promise.all(invoices.map(invoice => get(`/invoices/${invoice.apiId}`, signal)));
+  return details.flatMap((detail, index) => {
+    const path = `/invoices/${invoices[index].apiId}`;
+    object(detail, path);
+    return rows(detail.postings, path, postingRow);
+  });
+}
+
 // Returns a fresh normalized invoice plus real case questions, postings and matching events.
 // /events is the server's bounded event window (200 by default), not a full audit export.
 export async function loadPlatformInvoice(apiId, { signal } = {}) {

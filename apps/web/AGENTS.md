@@ -8,6 +8,6 @@ When implementing from a selected generated mock, treat that image as the source
 
 The owner selected Next.js App Router and Tailwind CSS, running in a separate web container from FastAPI. Keep reusable UI in `src/` and Next.js routes in `app/`. This supersedes the initial Vite/Sites scaffold. Preserve the selected F visual direction during migration.
 
-Use the shared FastAPI platform as the source of truth. `API_BASE_URL` is server-only runtime configuration. Never put platform credentials in browser code. The dashboard proxy exposes public reads only; synthetic walkthrough state must be explicitly selected and labelled.
+Use the shared FastAPI platform as the source of truth. `API_BASE_URL` is server-only runtime configuration. Never put platform credentials in browser code. The dashboard proxy exposes public reads only.
 
 Run `npm test` and `npm run build` before committing a completed feature. Check desktop and mobile behavior in the browser. A container build must be reported separately from a Next.js build.

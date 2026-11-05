@@ -33,6 +33,6 @@ Replace the network and `api:8000` with the actual FastAPI container service and
 
 ## Data and capabilities
 
-Platform mode reads invoices, questions, company context and recent events from FastAPI. Synthetic mode is an explicit local walkthrough; changes there reset on reload and do not write to FastAPI. Neither mode establishes a live KSeF, telephone, or chat connection. Invoice decisions shown in platform mode are backend records, not frontend-generated tax advice.
+The dashboard reads invoices, questions, company context and recent events from FastAPI. It does not establish a live KSeF, telephone, or chat connection. Invoice decisions shown here are backend records, not frontend-generated tax advice.
 
 The selected visual reference and provenance are in `../../docs/design/`. Automated tests cover domain transitions, CSV safety, API response validation and the read-only proxy boundary. Browser and container verification results are recorded separately in the project handoff.
