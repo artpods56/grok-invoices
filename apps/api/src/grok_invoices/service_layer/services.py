@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 from typing import Literal
 
 from grok_invoices import ksef, seed
-from grok_invoices.domain import rules
+from grok_invoices.domain import regulations, rules
 from grok_invoices.domain.errors import Conflict
 from grok_invoices.domain.models import (
     Account, Actor, Case, Event, EventType, Fact, Invoice, Posting, Question, QuestionStatus, ReceivedDocument,
@@ -75,6 +75,10 @@ def get_client() -> ClientProfile:
 
 def list_accounts() -> list[Account]:
     return get_client().accounts
+
+
+def search_regulations(query: str) -> regulations.SearchResult:
+    return regulations.search(query)
 
 
 def add_fact(command: AddFact) -> ClientProfile:
@@ -156,6 +160,11 @@ def get_invoice(invoice_id: int) -> InvoiceDetail:
 def get_invoice_xml(invoice_id: int) -> str:
     with UnitOfWork(write=False) as uow:
         return uow.invoices.require(invoice_id).source_xml
+
+
+def get_posting(posting_id: int) -> Posting:
+    with UnitOfWork(write=False) as uow:
+        return uow.postings.require(posting_id)
 
 
 def search_precedents(invoice_id: int) -> list[PrecedentMatch]:
@@ -286,6 +295,12 @@ def escalate_invoice(invoice_id: int, command: Escalate) -> CaseDetail:
 def list_cases(status: str | None = None) -> list[Case]:
     with UnitOfWork(write=False) as uow:
         return [c for c in uow.cases.all() if status is None or c.status == status]
+
+
+def list_open_cases() -> list[CaseDetail]:
+    """Cases not yet resolved, with the invoice summary and every question asked so far."""
+    with UnitOfWork(write=False) as uow:
+        return [_case_detail(uow, case) for case in uow.cases.all() if case.is_open]
 
 
 def get_case(case_id: int) -> CaseDetail:

@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     release: str | None = None  # Only set on the server.
     platform_api_key: str | None = None
     demo_client_phone: str | None = None
+    invoice_agent_token: str | None = None
+    regulations_agent_token: str | None = None
 
 
 def get_settings() -> Settings:

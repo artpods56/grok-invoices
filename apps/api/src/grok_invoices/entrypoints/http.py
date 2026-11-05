@@ -4,9 +4,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response
+from fastmcp.utilities.lifespan import combine_lifespans
 
 from grok_invoices.domain.errors import Conflict, DomainError, Invalid, KsefUnavailable, NotFound
 from grok_invoices.domain.models import Account, Case, CaseStatus, Event, InvoiceStatus, Posting, Question, QuestionStatus
+from grok_invoices.entrypoints.mcp_agents import invoices_app, regulations_app
 from grok_invoices.service_layer import commands, services
 from grok_invoices.service_layer.views import (
     CaseDetail, ClientProfile, InvoiceDetail, InvoiceSummary, IssuedInvoice, PrecedentMatch,
@@ -151,8 +153,14 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="Grok Invoices", version="0.1.0", lifespan=lifespan)
+app = FastAPI(
+    title="Grok Invoices",
+    version="0.1.0",
+    lifespan=combine_lifespans(lifespan, invoices_app.lifespan, regulations_app.lifespan),
+)
 app.include_router(router)
+app.mount("/agents/invoices", invoices_app)
+app.mount("/agents/regulations", regulations_app)
 
 
 @app.exception_handler(DomainError)
