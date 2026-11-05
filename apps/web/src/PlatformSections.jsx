@@ -45,6 +45,9 @@ export function PlatformSections({ page, invoices, snapshot, onInspect }) {
       {!events.length && <p className="panel-empty">No events in this window.</p>}
     </>;
   }
+  if (snapshot?.postingsError && ['Decisions', 'Sources', 'Precedents'].includes(page)) {
+    return <p className="panel-empty" role="alert">{snapshot.postingsError} Use Refresh above to retry.</p>;
+  }
   const invoiceById = new Map(invoices.map(invoice => [invoice.apiId, invoice]));
   const postings = (snapshot?.postings ?? []).filter(posting => invoiceById.has(posting.invoice_id));
   const treatment = posting => `Account ${posting.account} · ${posting.vat_deduction_percent}% VAT deduction (PLN ${posting.deductible_vat})`;

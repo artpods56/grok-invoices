@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { proxyPlatformRead } from '../src/api-proxy.js';
 
+test('invalid backend configuration fails safely before a network call', async () => {
+  for (const baseUrl of ['invalid-url', 'file:///private', 'https://user:password@example.com']) {
+    const response = await proxyPlatformRead(new Request('http://web/'), ['client'], {
+      baseUrl, fetcher: () => assert.fail('Invalid configuration must not be fetched'),
+    });
+    assert.equal(response.status, 502);
+    assert.equal((await response.text()).includes('password'), false);
+  }
+});
+
 test('proxy only forwards public GET data without user credentials', async () => {
   const request = new Request('http://web/api/invoices/3?secret=example', { headers: { Authorization: 'Bearer example', Cookie: 'session=example' } });
   const result = await proxyPlatformRead(request, ['invoices', '3'], {

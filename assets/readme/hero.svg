@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
+<title id="title">Grok Invoices — your agents' accounting workspace</title>
+<desc id="desc">Pastel blue, mint and peach cards for invoices, context and decisions.</desc>
+<defs>
+<linearGradient id="bg" x2="1" y2="1"><stop stop-color="#b5eef0"/><stop offset=".5" stop-color="#d4d5f5"/><stop offset="1" stop-color="#ffe3c4"/></linearGradient>
+<linearGradient id="blue" x2="1" y2="1"><stop stop-color="#bde9ff"/><stop offset=".5" stop-color="#dacaf2"/><stop offset="1" stop-color="#f8fbff"/></linearGradient>
+<linearGradient id="mint" x2="1" y2="1"><stop stop-color="#baf5ec"/><stop offset=".6" stop-color="#fff0d4"/><stop offset="1" stop-color="#fffaf5"/></linearGradient>
+<linearGradient id="pink" x2="1" y2="1"><stop stop-color="#edc1ee"/><stop offset=".55" stop-color="#ffd4c6"/><stop offset="1" stop-color="#fff8e9"/></linearGradient>
+</defs>
+<rect width="1200" height="380" rx="28" fill="url(#bg)"/>
+<rect x="24" y="24" width="1152" height="332" rx="24" fill="#fcfcfd" stroke="#fff" stroke-width="5"/>
+<g font-family="Inter,Segoe UI,Arial,sans-serif">
+<rect x="60" y="55" width="42" height="42" rx="10" fill="#c026d3"/>
+<text x="81" y="83" text-anchor="middle" font-size="19" font-weight="600" fill="#fff">GI</text>
+<text x="118" y="72" font-size="11" fill="#73757e" letter-spacing="2">GROK BOT HACKATHON</text>
+<text x="118" y="93" font-size="13" fill="#373943">Wrocław · 2026</text>
+<rect x="925" y="62" width="210" height="28" rx="14" fill="#f0edf8"/>
+<text x="1030" y="81" text-anchor="middle" font-size="11" letter-spacing="1" fill="#655884">AGENT AS A SERVICE</text>
+<text x="60" y="159" font-size="50" font-weight="600" letter-spacing="-2" fill="#202129">Grok Invoices</text>
+<text x="62" y="193" font-size="19" fill="#686b76">Your agents’ accounting workspace. Every decision, in context.</text>
+<rect x="60" y="224" width="346" height="102" rx="14" fill="url(#blue)"/>
+<rect x="427" y="224" width="346" height="102" rx="14" fill="url(#mint)"/>
+<rect x="794" y="224" width="346" height="102" rx="14" fill="url(#pink)"/>
+<g fill="#555b69" font-size="10" letter-spacing="1.5"><text x="80" y="248">01 / INVOICES</text><text x="447" y="248">02 / CONTEXT</text><text x="814" y="248">03 / DECISIONS</text></g>
+<g fill="#24262e" font-size="20" font-weight="600"><text x="80" y="277">Bring the invoice in.</text><text x="447" y="277">Ask what’s missing.</text><text x="814" y="277">Keep the reasoning.</text></g>
+<g fill="#626775" font-size="12"><text x="80" y="305">KSeF intake and purchase records</text><text x="447" y="305">Client facts and linked questions</text><text x="814" y="305">Postings, sources and precedents</text></g>
+</g>
+</svg>

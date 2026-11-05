@@ -32,11 +32,12 @@ jobs:
         with:
           node-version: 24
 
-      - name: Run web tests
+      - name: Test and build the dashboard
         working-directory: apps/web
         run: |
           npm ci
           npm test
+          npm run build
 
       - name: Configure SSH
         env:

@@ -33,6 +33,8 @@ function PlatformDetails({ invoice, onClose }) {
 
   useEffect(() => {
     const opener = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     closeButton.current?.focus();
     function onKeyDown(event) {
       if (event.key === 'Escape') {
@@ -54,6 +56,7 @@ function PlatformDetails({ invoice, onClose }) {
     document.addEventListener('keydown', onKeyDown, true);
     document.addEventListener('focusin', containFocus);
     return () => {
+      document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', onKeyDown, true);
       document.removeEventListener('focusin', containFocus);
       if (opener instanceof HTMLElement && opener.isConnected) opener.focus();
