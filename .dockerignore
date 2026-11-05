@@ -9,3 +9,6 @@ assets
 deploy
 Dockerfile
 README.md
+.data
+tests
+.pytest_cache
