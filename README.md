@@ -2,7 +2,7 @@
 
 # Grok Invoices
 
-A simple FastAPI application managed with uv and Python 3.13.
+The backend uses FastAPI, uv, Python 3.13, and SQLite.
 
 ## Run locally
 
@@ -75,8 +75,7 @@ npm run dev -- --host 127.0.0.1 --port 4173 --strictPort
 Open http://localhost:4173. Stop the server with Ctrl+C. Run `npm test` for domain and static-host tests, and `npm run build` for the production bundle. The local demo state resets on page reload.
 
 Created in [T3 Code](https://t3.codes).
-=======
-A simple FastAPI application managed with uv and Python 3.13.
+The backend uses FastAPI, uv, Python 3.13, and SQLite.
 
 ## Run locally
 
@@ -123,4 +122,3 @@ on the server; locally, leave it unset to skip the check.
 
 A schema change in `apps/api/src/db.py` rebuilds the database from the seed on the next start,
 which discards existing data.
->>>>>>> origin/main
