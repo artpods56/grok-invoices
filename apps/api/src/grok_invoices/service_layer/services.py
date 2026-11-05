@@ -20,7 +20,7 @@ from grok_invoices.service_layer.commands import (
 from grok_invoices.service_layer.secrets import decrypt_secret, encrypt_secret
 from grok_invoices.service_layer.unit_of_work import UnitOfWork, init_store
 from grok_invoices.service_layer.views import (
-    CaseDetail, ClientProfile, ClientStatus, InvoiceDetail, InvoiceSummary, IssuedInvoice, KsefConfigured,
+    CaseDetail, ClientProfile, ClientStatus, DocumentContent, InvoiceDetail, InvoiceSummary, IssuedInvoice, KsefConfigured,
     OpenQuestion, PrecedentMatch, StoredDocument,
 )
 
@@ -126,6 +126,9 @@ def configure_ksef(ksef_token: str) -> KsefConfigured:
     token = rules.require_ksef_token(ksef_token)
     ciphertext = encrypt_secret(token)
     last_four = token[-4:]
+    with UnitOfWork(write=False) as uow:
+        nip = uow.client.nip
+    ksef.verify_token(nip, token)
     with UnitOfWork() as uow:
         stored = uow.ksef_tokens.all()
         if stored:
@@ -145,6 +148,16 @@ def submit_document(name: str, content_text: str) -> StoredDocument:
         document = uow.documents.add(ClientDocument(name=name, content_text=content_text, created_at=_now()))
         _log(uow, "client_agent", "document_submitted", f"Dokument od klienta: {name}", document_id=document.id, name=name)
         return StoredDocument(id=document.id, name=document.name)
+
+
+def list_documents() -> list[StoredDocument]:
+    with UnitOfWork(write=False) as uow:
+        return [StoredDocument.model_validate(document) for document in uow.documents.all()]
+
+
+def get_document(document_id: int) -> DocumentContent:
+    with UnitOfWork(write=False) as uow:
+        return DocumentContent.model_validate(uow.documents.require(document_id))
 
 
 def get_status() -> ClientStatus:

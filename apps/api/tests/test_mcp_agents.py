@@ -35,6 +35,8 @@ REGULATIONS_TOOLS = {
     "search_precedents",
     "list_accounts",
     "search_regulations",
+    "list_documents",
+    "get_document",
     "ask_client",
     "save_vehicle",
     "decide",
@@ -319,3 +321,14 @@ def test_demo_through_the_tools(api, tokens):
 
     timeline = call(api, REGULATIONS_URL, REGULATIONS_TOKEN, "get_timeline", {"after_event_id": 0})
     assert {"invoice_posted", "case_opened", "question_asked", "precedent_created"} <= {event["type"] for event in timeline}
+
+
+def test_regulations_bot_reads_what_the_client_submitted(api, tokens):
+    from grok_invoices.service_layer import services
+
+    document = services.submit_document("Umowa leasingu", "Skoda GD 9R247, leasing do 2028")
+    listed = call(api, REGULATIONS_URL, REGULATIONS_TOKEN, "list_documents")
+    assert "Umowa leasingu" in str(listed)
+    assert "leasing do 2028" not in str(listed)
+    opened = call(api, REGULATIONS_URL, REGULATIONS_TOKEN, "get_document", {"document_id": document.id})
+    assert "leasing do 2028" in str(opened)

@@ -96,3 +96,9 @@ class StoredDocument(View):
 
     id: int
     name: str
+
+
+class DocumentContent(StoredDocument):
+    """For the bots' MCP servers only. Reads under /api are public, so no route returns this."""
+
+    content_text: str

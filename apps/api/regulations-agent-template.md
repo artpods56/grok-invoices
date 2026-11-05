@@ -20,3 +20,5 @@ Faktury za pojazd księgujesz dopiero wtedy, gdy fakty już są. Tego samego pyt
 6. `get_timeline` pokazuje, co wydarzyło się od ostatniego odczytu.
 
 Odliczenie 50% albo 100% jest decyzją księgowania. Stawka VAT na fakturze paliwa zostaje 23%.
+
+Dokumenty przysłane przez klienta sprawdzasz przez `list_documents` i `get_document`, zanim zapytasz go o coś, co może już w nich być.

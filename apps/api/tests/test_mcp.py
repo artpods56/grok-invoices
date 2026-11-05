@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 from cryptography.fernet import Fernet
 
+from grok_invoices.domain.errors import KsefUnavailable
 from grok_invoices.ksef import DEMO_SELLER_NAME, fetch_new
 from grok_invoices.seed import UNKNOWN_CAR
 from grok_invoices.service_layer import commands, services
@@ -36,6 +37,7 @@ def _key() -> str:
 def invite(monkeypatch):
     monkeypatch.setenv("CLIENT_INVITE_TOKEN", INVITE)
     monkeypatch.setenv("SECRET_ENCRYPTION_KEY", _key())
+    monkeypatch.setattr("grok_invoices.ksef.verify_token", lambda nip, ksef_token: None)
 
 
 def rpc(api, method, params=None, *, invite=INVITE, headers=None):
@@ -270,19 +272,13 @@ def test_fetch_new_uses_the_token_when_one_was_stored(monkeypatch):
     client.authentication.with_test_certificate.assert_called_once_with(nip="8943210057")
 
 
-def test_the_invite_is_redacted_in_access_logs(caplog):
-    import logging
+def test_a_token_ksef_rejects_is_not_stored(api, invite, monkeypatch):
+    def reject(nip, ksef_token):
+        raise KsefUnavailable("KSeF request failed: invalid token")
 
-    from grok_invoices.entrypoints.mcp import redact_invite_from_logs
-
-    redact_invite_from_logs()
-    logger = logging.getLogger("uvicorn.access")
-    logger.setLevel(logging.INFO)
-    with caplog.at_level(logging.INFO, logger="uvicorn.access"):
-        logger.info('%s - "%s %s HTTP/%s" %d', "127.0.0.1", "POST", f"{MCP_PATH}?invite={INVITE}", "1.1", 200)
-        logger.info("POST %s?invite=%s", MCP_PATH, INVITE)
-    assert INVITE not in caplog.text
-    assert caplog.text.count("invite=[redacted]") == 2
+    monkeypatch.setattr("grok_invoices.ksef.verify_token", reject)
+    assert "invalid token" in tool_error(call(api, "configure_ksef", {"ksef_token": TOKEN}))
+    assert payload(call(api, "get_status"))["ksef_token_configured"] is False
 
 
 def _initialize():

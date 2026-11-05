@@ -4,72 +4,12 @@ The platform does not call a model. Each tool parses arguments, calls a service,
 and returns that result. The actor is fixed by the server.
 """
 
-import hashlib
-import hmac
-from collections.abc import Callable
-from typing import Any
-
 from fastmcp import FastMCP
-from fastmcp.exceptions import ToolError
-from starlette.middleware import Middleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
 
-from grok_invoices.domain.errors import DomainError
 from grok_invoices.domain.models import PrecedentConditions, ReceivedDocument, VehicleUsage
+from grok_invoices.entrypoints.mcp_common import bot_http_app, dump, guarded
 from grok_invoices.service_layer import commands, services
 from grok_invoices.settings import get_settings
-
-_HTTP = {"path": "/mcp", "stateless_http": True, "json_response": True}
-
-
-def _same_token(given: str, token: str | None) -> bool:
-    """Constant-time invite check. An empty setting matches nothing.
-
-    compare_digest rejects unequal lengths, so both sides are hashed first.
-    A wrong token is then a 401, and the token itself is not logged.
-    """
-    if not token:
-        return False
-    return hmac.compare_digest(
-        hashlib.sha256(given.encode()).digest(),
-        hashlib.sha256(token.encode()).digest(),
-    )
-
-
-class RequireToken:
-    """Refuse the connection unless this server's invite matches."""
-
-    def __init__(self, app, get_token: Callable[[], str | None]):
-        self.app = app
-        self.get_token = get_token
-
-    async def __call__(self, scope, receive, send):
-        if scope["type"] == "http":
-            request = Request(scope)
-            given = request.query_params.get("invite") or request.headers.get("x-invite") or ""
-            if not _same_token(given, self.get_token()):
-                await JSONResponse({"detail": "Missing or invalid invite"}, status_code=401)(scope, receive, send)
-                return
-        await self.app(scope, receive, send)
-
-
-def _call[T](fn: Callable[[], T]) -> T:
-    try:
-        return fn()
-    except DomainError as error:
-        raise ToolError(str(error)) from error
-
-
-def _dump(value: Any) -> Any:
-    if hasattr(value, "model_dump"):
-        return value.model_dump(mode="json")
-    if isinstance(value, list):
-        return [_dump(item) for item in value]
-    if isinstance(value, dict):
-        return {key: _dump(item) for key, item in value.items()}
-    return value
-
 
 def _lines(invoice_id: int) -> dict:
     detail = services.get_invoice(invoice_id)
@@ -105,7 +45,7 @@ def _share(*servers: FastMCP):
 @invoices.tool
 def fetch_new_invoices() -> list[dict]:
     """Download new purchase invoices from KSeF TEST and store the ones not here yet."""
-    return _dump(_call(lambda: services.sync_ksef("test")))
+    return dump(guarded(lambda: services.sync_ksef("test")))
 
 
 @invoices.tool
@@ -114,22 +54,22 @@ def add_invoice(ksef_number: str, xml: str) -> dict:
 
     Returns the new invoice, or says it was already stored.
     """
-    added = _call(lambda: services.ingest_documents([ReceivedDocument(ksef_number, xml.encode())]))
+    added = guarded(lambda: services.ingest_documents([ReceivedDocument(ksef_number, xml.encode())]))
     if not added:
         return {"stored": False, "detail": "Invoice was already stored"}
-    return {"stored": True, "invoice": _dump(added[0])}
+    return {"stored": True, "invoice": dump(added[0])}
 
 
 @invoices.tool
 def list_pending_invoices() -> list[dict]:
     """Invoices still in status received."""
-    return _dump(services.list_invoices("received"))
+    return dump(services.list_invoices("received"))
 
 
 @invoices.tool
 def get_invoice(invoice_id: int) -> dict:
     """Summary, line items, and the vehicle plate read from the parsed invoice."""
-    return _call(lambda: _lines(invoice_id))
+    return guarded(lambda: _lines(invoice_id))
 
 
 @_share(invoices, regulations)
@@ -138,13 +78,13 @@ def search_precedents(invoice_id: int) -> list[dict]:
 
     Best match first. applicable false means the platform will reject reuse. Read blockers.
     """
-    return _dump(_call(lambda: services.search_precedents(invoice_id)))
+    return dump(guarded(lambda: services.search_precedents(invoice_id)))
 
 
 @_share(invoices, regulations)
 def list_accounts() -> list[dict]:
     """The client's chart of accounts."""
-    return _dump(services.list_accounts())
+    return dump(services.list_accounts())
 
 
 @invoices.tool
@@ -152,7 +92,7 @@ def post_by_rule(
     invoice_id: int, account: str, vat_deduction_percent: int, rationale: str, confidence: float,
 ) -> dict:
     """Book a simple invoice by rule. The server records the actor and source."""
-    return _dump(_call(lambda: services.post_invoice(invoice_id, commands.PostInvoice(
+    return dump(guarded(lambda: services.post_invoice(invoice_id, commands.PostInvoice(
         account=account,
         vat_deduction_percent=vat_deduction_percent,
         rationale=rationale,
@@ -176,13 +116,13 @@ def post_by_precedent(invoice_id: int, precedent_id: int, rationale: str, confid
             source="precedent",
             precedent_id=precedent_id,
         ))
-    return _dump(_call(run))
+    return dump(guarded(run))
 
 
 @invoices.tool
 def escalate(invoice_id: int, reason: str) -> dict:
     """Hand the invoice to the regulations agent. Put the blockers in the reason."""
-    return _dump(_call(lambda: services.escalate_invoice(
+    return dump(guarded(lambda: services.escalate_invoice(
         invoice_id, commands.Escalate(reason=reason, actor="invoice_agent"),
     )))
 
@@ -190,37 +130,49 @@ def escalate(invoice_id: int, reason: str) -> dict:
 @_share(invoices, regulations)
 def get_timeline(after_event_id: int = 0) -> list[dict]:
     """Timeline events with an id greater than after_event_id, oldest first."""
-    return _dump(services.list_events(after_event_id))
+    return dump(services.list_events(after_event_id))
 
 
 @regulations.tool
 def list_open_cases() -> list[dict]:
     """Cases not yet resolved, each with its invoice summary and its questions."""
-    return _dump(services.list_open_cases())
+    return dump(services.list_open_cases())
 
 
 @regulations.tool
 def get_case(case_id: int) -> dict:
     """One case, its invoice summary, and every question asked on it."""
-    return _dump(_call(lambda: services.get_case(case_id)))
+    return dump(guarded(lambda: services.get_case(case_id)))
 
 
 @regulations.tool
 def get_client_context() -> dict:
     """The client profile agents may use: fleet, facts, and accounts."""
-    return _dump(services.get_client())
+    return dump(services.get_client())
 
 
 @regulations.tool
 def search_regulations(query: str) -> dict:
     """Search the VAT corpus. Only the returned provisions may be cited."""
-    return _dump(services.search_regulations(query))
+    return dump(services.search_regulations(query))
+
+
+@regulations.tool
+def list_documents() -> list[dict]:
+    """Documents the client submitted, without their text. Read one with get_document."""
+    return dump(services.list_documents())
+
+
+@regulations.tool
+def get_document(document_id: int) -> dict:
+    """The full text of one document the client submitted."""
+    return dump(guarded(lambda: services.get_document(document_id)))
 
 
 @regulations.tool
 def ask_client(case_id: int, question: str) -> dict:
     """Ask the client one question about this case."""
-    return _dump(_call(lambda: services.ask_client(
+    return dump(guarded(lambda: services.ask_client(
         case_id, commands.AskClient(text=question, actor="regulations_agent"),
     )))
 
@@ -228,7 +180,7 @@ def ask_client(case_id: int, question: str) -> dict:
 @regulations.tool
 def save_vehicle(plate: str, model: str, usage: VehicleUsage) -> dict:
     """Record a car the client confirmed is used by the company."""
-    return _dump(_call(lambda: services.save_vehicle(commands.SaveVehicle(
+    return dump(guarded(lambda: services.save_vehicle(commands.SaveVehicle(
         plate=plate, model=model, usage=usage, actor="regulations_agent",
     ))))
 
@@ -260,14 +212,8 @@ def decide(
             reusable=True,
             conditions=conditions or PrecedentConditions(),
         ))
-    return _dump(_call(run))
+    return dump(guarded(run))
 
 
-invoices_app = invoices.http_app(
-    **_HTTP,
-    middleware=[Middleware(RequireToken, get_token=lambda: get_settings().invoice_agent_token)],
-)
-regulations_app = regulations.http_app(
-    **_HTTP,
-    middleware=[Middleware(RequireToken, get_token=lambda: get_settings().regulations_agent_token)],
-)
+invoices_app = bot_http_app(invoices, lambda: get_settings().invoice_agent_token)
+regulations_app = bot_http_app(regulations, lambda: get_settings().regulations_agent_token)

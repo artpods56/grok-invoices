@@ -4,106 +4,18 @@ Grok Bot reaches this through Cloudflare, which drops idle connections after abo
 100 seconds, so the transport is stateless HTTP with a JSON body and no SSE session.
 """
 
-import hmac
-import logging
-import re
+from collections.abc import Callable
 from typing import Any
 
 from fastmcp import FastMCP
-from fastmcp.exceptions import ToolError
-from starlette.middleware import Middleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
 
-from grok_invoices.domain.errors import DomainError
+from grok_invoices.entrypoints.mcp_common import bot_http_app, dump, guarded
 from grok_invoices.service_layer import commands, services
 from grok_invoices.settings import get_settings
 
-_INVITE_IN_URL = re.compile(r"(invite=)[^&\s\"']+")
 
-
-class _RedactInvite(logging.Filter):
-    """Uvicorn logs the request path, which is where the invite arrives.
-
-    The path is usually a %-format argument, so scrub the rendered line. Editing
-    the format string in place would eat the placeholder and break logging.
-    """
-
-    def filter(self, record: logging.LogRecord) -> bool:
-        if not _record_has_invite(record):
-            return True
-        try:
-            rendered = record.getMessage()
-        except Exception:
-            rendered = str(record.msg)
-        record.msg = _scrub(rendered)
-        record.args = ()
-        return True
-
-
-def _scrub(value: str) -> str:
-    return _INVITE_IN_URL.sub(r"\1[redacted]", value)
-
-
-def _record_has_invite(record: logging.LogRecord) -> bool:
-    if isinstance(record.msg, str) and "invite=" in record.msg:
-        return True
-    args = record.args
-    if isinstance(args, tuple):
-        return any(isinstance(arg, str) and "invite=" in arg for arg in args)
-    if isinstance(args, dict):
-        return any(isinstance(value, str) and "invite=" in value for value in args.values())
-    return False
-
-
-def redact_invite_from_logs() -> None:
-    redact = _RedactInvite()
-    loggers = [logging.getLogger(name) for name in ("", "uvicorn", "uvicorn.access", "uvicorn.error")]
-    for logger in loggers:
-        if not any(isinstance(existing, _RedactInvite) for existing in logger.filters):
-            logger.addFilter(redact)
-        for handler in logger.handlers:
-            if not any(isinstance(existing, _RedactInvite) for existing in handler.filters):
-                handler.addFilter(redact)
-
-
-class RequireToken:
-    """Invite check for MCP. The platform API key is not accepted here.
-
-    The setting is read on each request, so a missing setting refuses everything
-    and tests can change it without restarting the process.
-    """
-
-    def __init__(self, app: Any, get_token: Any) -> None:
-        self.app = app
-        self.get_token = get_token
-
-    async def __call__(self, scope: dict, receive: Any, send: Any) -> None:
-        if scope["type"] == "http":
-            request = Request(scope)
-            given = request.query_params.get("invite") or request.headers.get("x-invite") or ""
-            token = self.get_token()
-            if not token or not hmac.compare_digest(given.encode(), token.encode()):
-                await JSONResponse({"detail": "Missing or invalid invite"}, status_code=401)(scope, receive, send)
-                return
-        await self.app(scope, receive, send)
-
-
-def _call(action: Any) -> Any:
-    try:
-        value = action()
-    except DomainError as error:
-        raise ToolError(str(error)) from error
-    if isinstance(value, list):
-        return [_dump(item) for item in value]
-    return _dump(value)
-
-
-def _dump(value: Any) -> Any:
-    dump = getattr(value, "model_dump", None)
-    if dump is None:
-        return value
-    return dump(mode="json")
+def _call(action: Callable[[], Any]) -> Any:
+    return dump(guarded(action))
 
 
 mcp = FastMCP(
@@ -184,9 +96,4 @@ def get_status() -> dict:
     return _call(services.get_status)
 
 
-client_mcp_app = mcp.http_app(
-    path="/mcp",
-    stateless_http=True,
-    json_response=True,
-    middleware=[Middleware(RequireToken, get_token=lambda: get_settings().client_invite_token)],
-)
+client_mcp_app = bot_http_app(mcp, lambda: get_settings().client_invite_token)

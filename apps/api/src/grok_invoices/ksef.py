@@ -53,6 +53,11 @@ def fetch_new(
     return _with_ksef(fetch)
 
 
+def verify_token(nip: str, ksef_token: str) -> None:
+    """Log in once, so a bad token is refused when it's configured and not at a later fetch."""
+    _with_ksef(lambda client: client.authentication.with_token(ksef_token=ksef_token, nip=nip))
+
+
 def build_invoice_xml(
     *, seller_nip: str, seller_name: str, seller_address: str, buyer_nip: str, buyer_name: str,
     number: str, issued: date, line: str, unit: str, quantity: Decimal, unit_price: Decimal, plate: str | None = None,

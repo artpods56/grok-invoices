@@ -35,7 +35,10 @@ Code lives in `apps/api/src/grok_invoices`. Dependencies only point inward, and
 - `service_layer/commands.py`, `views.py`: what services take and return.
 - `service_layer/unit_of_work.py`: the SQLite transaction and repositories.
 - `entrypoints/http.py`: FastAPI app, routes under `/api`, the API key check, `/health`.
+- `entrypoints/mcp.py`: the client bot's FastMCP server.
 - `entrypoints/mcp_agents.py`: FastMCP servers for the invoice and regulations bots, with the actor fixed per server.
+- `entrypoints/mcp_common.py`: what those servers share: the invite check, the transport, reporting errors.
+- `service_layer/secrets.py`: encrypts the stored KSeF token.
 - `ksef.py`: KSeF TEST calls through ksef2.
 - `seed.py`: demo data and fixture invoices.
 - `settings.py`: configuration from the environment.
@@ -52,6 +55,7 @@ rolls back to the previous one.
 - Bumping `STORE_VERSION` in `unit_of_work.py` deletes the production database on the next
   start and rebuilds it from the seed. Say so in the commit message.
 - The app won't start on the server without `PLATFORM_API_KEY`.
+- Bots authenticate with a token in the URL, so access logs stay off. Don't turn them back on.
 - `deploy/` changes don't apply on push. Someone has to re-run `deploy/install.sh` on the server.
 
 ## Rules for changing the code
