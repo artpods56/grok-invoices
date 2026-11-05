@@ -7,7 +7,7 @@ from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Literal
 
-from grok_invoices import ksef, seed
+from grok_invoices import ksef, legal_sources, seed
 from grok_invoices.domain import regulations, rules
 from grok_invoices.domain.errors import Conflict
 from grok_invoices.domain.models import (
@@ -81,6 +81,22 @@ def list_accounts() -> list[Account]:
 
 def search_regulations(query: str) -> regulations.SearchResult:
     return regulations.search(query)
+
+
+def search_legal_acts(title: str, offset: int = 0, limit: int = 25) -> dict:
+    return legal_sources.search_acts(title, offset, limit)
+
+
+def get_legal_act(eli: str) -> dict:
+    return legal_sources.get_act(eli)
+
+
+def read_legal_text(eli: str, article: str | None = None, offset: int = 0) -> dict:
+    return legal_sources.read_text(eli, article, offset)
+
+
+def check_legal_updates(since: str, offset: int = 0, limit: int = 100) -> dict:
+    return legal_sources.check_updates(since, offset, limit)
 
 
 def add_fact(command: AddFact) -> ClientProfile:
@@ -291,6 +307,7 @@ def post_invoice(invoice_id: int, command: PostInvoice) -> Posting:
             precedent = uow.postings.require(command.precedent_id)
             if not precedent.is_active_precedent:
                 raise Conflict(f"Posting {command.precedent_id} is not an active precedent")
+            rules.ensure_precedent_outcome(precedent, command.account, command.vat_deduction_percent)
             blockers = rules.precedent_blockers(invoice, precedent.conditions, client, _on_hold(uow, invoice))
             if blockers:
                 raise Conflict(f"Precedent does not apply: {'; '.join(blockers)}")
@@ -395,6 +412,10 @@ def get_case(case_id: int) -> CaseDetail:
 def ask_client(case_id: int, command: AskClient) -> Question:
     with UnitOfWork() as uow:
         case = uow.cases.require(case_id)
+        case.ensure_open()
+        for question in uow.questions.all():
+            if (question.case_id, question.text, question.asked_by, question.status) == (case_id, command.text, command.actor, "open"):
+                return question
         case.wait_for_client()
         question = uow.questions.add(Question(case_id=case_id, text=command.text, asked_by=command.actor, created_at=_now()))
         _log(uow, command.actor, "question_asked", f"Pytanie do klienta: {command.text}", case.invoice_id, case_id, question_id=question.id)
@@ -430,6 +451,8 @@ def list_open_questions() -> list[OpenQuestion]:
 def answer_question(question_id: int, command: AnswerQuestion) -> Question:
     with UnitOfWork() as uow:
         question = uow.questions.require(question_id)
+        if question.has_same_answer(command.answer, command.actor):
+            return question
         case = uow.cases.require(question.case_id)
         case.ensure_open()
         question.record_answer(command.answer, command.actor, _now())

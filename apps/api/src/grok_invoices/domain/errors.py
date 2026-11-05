@@ -16,3 +16,7 @@ class Invalid(DomainError):
 
 class KsefUnavailable(DomainError):
     """KSeF could not complete the call. Fixtures remain available as a fallback."""
+
+
+class LegalSourceUnavailable(DomainError):
+    """No usable official legal evidence was acquired. Never implies approval."""

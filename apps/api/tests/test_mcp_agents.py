@@ -35,6 +35,10 @@ REGULATIONS_TOOLS = {
     "search_precedents",
     "list_accounts",
     "search_regulations",
+    "search_legal_acts",
+    "get_legal_act",
+    "read_legal_text",
+    "check_legal_updates",
     "list_documents",
     "get_document",
     "ask_client",
@@ -272,7 +276,10 @@ def test_demo_through_the_tools(api, tokens):
     assert any(vehicle["plate"] == UNKNOWN_CAR for vehicle in fleet["fleet"])
     assert "phone" not in fleet
 
-    found = call(api, REGULATIONS_URL, REGULATIONS_TOKEN, "search_regulations", {"query": "paliwo użytek mieszany"})
+    found = call(api, REGULATIONS_URL, REGULATIONS_TOKEN, "search_regulations", {"query": "fuel mixed"})
+    assert found["validation_status"] == "synthetic_demo"
+    assert found["authoritative"] is False
+    assert found["legally_validated_at"] is None
     assert "23%" in found["booking_note"]
     citations = {item["citation"] for item in found["provisions"]}
     assert citations
@@ -332,3 +339,17 @@ def test_regulations_bot_reads_what_the_client_submitted(api, tokens):
     assert "leasing do 2028" not in str(listed)
     opened = call(api, REGULATIONS_URL, REGULATIONS_TOKEN, "get_document", {"document_id": document.id})
     assert "leasing do 2028" in str(opened)
+
+
+def test_legal_sources_are_available_only_to_the_regulations_role(api, tokens, monkeypatch):
+    from grok_invoices import legal_sources
+
+    def fail_request(*args, **kwargs):
+        from grok_invoices.domain.errors import LegalSourceUnavailable
+        raise LegalSourceUnavailable("ELI returned an empty body; no legal evidence was acquired")
+    monkeypatch.setattr(legal_sources, "_fetch", fail_request)
+    refused = call(api, REGULATIONS_URL, REGULATIONS_TOKEN, "read_legal_text", {"eli": "DU/2004/535", "article": "86a"})
+    assert "no legal evidence" in refused["_error"]
+    assert services.list_open_cases() == []
+    wrong_role = call(api, INVOICE_URL, INVOICE_TOKEN, "get_legal_act", {"eli": "DU/2004/535"})
+    assert "_error" in wrong_role

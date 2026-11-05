@@ -4,7 +4,7 @@ import re
 from collections.abc import Iterable
 
 from grok_invoices.domain.errors import Conflict, Invalid
-from grok_invoices.domain.models import Actor, Client, Invoice, PostingSource, PrecedentConditions, normalize_plate
+from grok_invoices.domain.models import Actor, Client, Invoice, Posting, PostingSource, PrecedentConditions, normalize_plate
 
 POSTING_ACTORS: tuple[Actor, ...] = ("invoice_agent", "regulations_agent", "accountant")
 
@@ -73,6 +73,11 @@ def ensure_posting_allowed(
         raise Conflict(f"Invoice names vehicle {invoice.vehicle_plate}: use a precedent or escalate it")
     if source == "regulation" and not has_open_case:
         raise Conflict("A regulation decision needs an open case: escalate the invoice first")
+
+
+def ensure_precedent_outcome(precedent: Posting, account: str, vat_deduction_percent: int) -> None:
+    if (account, vat_deduction_percent) != (precedent.account, precedent.vat_deduction_percent):
+        raise Conflict("Reusing a precedent must preserve its account and VAT deduction")
 
 
 _NIP_WEIGHTS = (6, 5, 7, 2, 3, 4, 5, 6, 7)

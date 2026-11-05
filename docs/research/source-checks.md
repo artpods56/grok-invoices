@@ -49,3 +49,19 @@ Checked on 2026-11-05 using unauthenticated, read-only HTTP requests. These chec
 - [xAI web search](https://docs.x.ai/developers/tools/web-search): documents live search and domain filtering. This task inspected documentation; it did not verify account/model access, billing, or a running Grok Bot integration.
 
 All production cadences, freshness thresholds, and source-validation gates in the research reports are design recommendations, not guarantees supplied by these services.
+
+## Implemented acquisition probes — 2026-11-05, 19:33 UTC
+
+The new `legal_sources` functions were exercised with read-only requests, without taxpayer
+data. Act metadata for `DU/2004/535` returned `changeDate=2026-11-03T00:00:00` and
+`validation_status=requires_review`. The change listing returned 2 of 124 items, an explicit
+`next_offset=2` and `coverage_complete=false`; this was not a full monitoring scan.
+
+Title search returned a 25-item page with a continuation cursor. Reading the base act's
+HTML returned a 20,000-character excerpt with a cursor. This demonstrates acquisition,
+not that the base publication is the applicable consolidated wording for a new invoice.
+
+The `art=86a` fragment again returned an empty body. The implemented reader rejected it
+with `LegalSourceUnavailable` and reported that no legal evidence was acquired. It did not
+approve a deduction from the response. No Grok Bot connection, recurring trigger, policy
+activation or source-archive integration was tested by these probes.

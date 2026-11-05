@@ -1,4 +1,4 @@
-"""The VAT provisions the regulations agent may cite. No others."""
+"""Simplified demo examples. Not verbatim provisions or a maintained legal corpus."""
 
 import re
 
@@ -13,30 +13,35 @@ class Provision(BaseModel):
 class SearchResult(BaseModel):
     booking_note: str
     provisions: list[Provision]
+    validation_status: str = "synthetic_demo"
+    authoritative: bool = False
+    source_url: str = "https://eli.gov.pl/eli/DU/2004/535/ogl"
+    legally_validated_at: str | None = None
+    scope_note: str = "Incomplete illustrative paraphrases. Verify official text, amendments, dates and facts before real use."
 
 
-BOOKING_NOTE = "Odliczenie VAT jest decyzją księgowania. Stawka VAT na fakturze zostaje 23%."
+BOOKING_NOTE = "VAT deduction is a posting decision. The demo fuel invoice's VAT rate remains 23%."
 
 CORPUS: tuple[Provision, ...] = (
     Provision(
         citation="art. 86a ust. 1 ustawy o VAT",
         text=(
-            "Pojazd w użytku mieszanym: 50% odliczenia VAT naliczonego "
-            "od wydatków na pojazd i na paliwo."
+            "Demo assumption: mixed-use vehicle fuel, 50% input VAT deduction. "
+            "Taxpayer status, taxable business purpose and exclusions still require verification."
         ),
     ),
     Provision(
         citation="art. 86a ust. 3, 4 i 12 ustawy o VAT",
         text=(
-            "Odliczenie 100% tylko przy wyłącznym użytkowaniu w działalności, "
-            "po złożeniu VAT-26 i prowadzeniu ewidencji przebiegu."
+            "Exclusive business use can require additional evidence, mileage records and VAT-26. "
+            "Exceptions and deadlines must be verified; a company-use declaration alone is insufficient."
         ),
     ),
     Provision(
         citation="art. 86 ust. 1 i art. 88 ustawy o VAT",
         text=(
-            "Samochód prywatny nieużywany w działalności nie daje odliczenia. "
-            "Wydatek nie ma związku z działalnością opodatkowaną."
+            "Demo assumption: a purchase without a taxable business purpose has no input VAT deduction. "
+            "Private ownership alone does not establish that there is no business use."
         ),
     ),
 )

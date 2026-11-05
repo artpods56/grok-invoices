@@ -153,8 +153,42 @@ def get_client_context() -> dict:
 
 @regulations.tool
 def search_regulations(query: str) -> dict:
-    """Search the VAT corpus. Only the returned provisions may be cited."""
+    """Search simplified synthetic VAT examples, not current authoritative law.
+
+    Use the official legal-source tools before making a real tax decision.
+    """
     return dump(services.search_regulations(query))
+
+
+@regulations.tool
+def search_legal_acts(title: str, offset: int = 0, limit: int = 25) -> dict:
+    """Search official ELI act titles. Follow next_offset; a hit does not establish applicability."""
+    return guarded(lambda: services.search_legal_acts(title, offset, limit))
+
+
+@regulations.tool
+def get_legal_act(eli: str) -> dict:
+    """Read official metadata, dates and references, e.g. DU/2004/535. Acquisition is not legal validation."""
+    return guarded(lambda: services.get_legal_act(eli))
+
+
+@regulations.tool
+def read_legal_text(eli: str, article: str | None = None, offset: int = 0) -> dict:
+    """Read an ELI publication's text or article. Empty fragments fail; follow next_offset for the full text.
+
+    Returns the URL, retrieval time and content hash. Verify amendments and applicability separately.
+    """
+    return guarded(lambda: services.read_legal_text(eli, article, offset))
+
+
+@regulations.tool
+def check_legal_updates(since: str, offset: int = 0, limit: int = 100) -> dict:
+    """Read one ELI change page for ALL topics since YYYY-MM-DDTHH:MM:SS (publisher time).
+
+    Drain every page from offset 0, overlap scans and deduplicate. No scheduler or checkpoint is installed.
+    A metadata change is a review signal, not an effective date or automatic policy update.
+    """
+    return guarded(lambda: services.check_legal_updates(since, offset, limit))
 
 
 @regulations.tool

@@ -225,6 +225,9 @@ class Question(Entity):
     created_at: datetime
     answered_at: datetime | None = None
 
+    def has_same_answer(self, answer: str, actor: Actor) -> bool:
+        return self.status == "answered" and self.answer == answer and self.answered_by == actor
+
     def record_answer(self, answer: str, actor: Actor, now: datetime) -> None:
         if self.status != "open":
             raise Conflict("This question is already answered")
