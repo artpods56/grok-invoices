@@ -1,0 +1,996 @@
+
+> check
+> npx --yes hyperframes@0.9.16 check --json
+
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 6
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "duration": 22.5,
+    "samples": [
+      1.25,
+      3.75,
+      6.25,
+      8.75,
+      11.25,
+      13.75,
+      16.25,
+      18.75,
+      21.25
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 0,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 10,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.04:1; WCAG AA requires 4.5:1.",
+        "text": "Demo Logistyka sp. z o.o.",
+        "fg": "rgb(119,119,119)",
+        "bg": "rgb(243,243,243)",
+        "ratio": 4.04,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(111,111,111)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > aside > button > span > span",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 195.55740356445312,
+          "y": 86.64649963378906,
+          "width": 144.0767822265625,
+          "height": 18.009597778320312
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3.14:1; WCAG AA requires 4.5:1.",
+        "text": "Dashboard",
+        "fg": "rgb(140,142,146)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 3.14,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,115,119)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > header > div:nth-of-type(1) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 415.53179931640625,
+          "y": 87.28970336914062,
+          "width": 86.18878173828125,
+          "height": 20.5823974609375
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3.14:1; WCAG AA requires 4.5:1.",
+        "text": "›",
+        "fg": "rgb(140,142,146)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 3.14,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(114,115,119)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > header > div:nth-of-type(1) > span:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 513.2981567382812,
+          "y": 82.14410400390625,
+          "width": 10.29119873046875,
+          "height": 30.87359619140625
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 3.11:1; WCAG AA requires 4.5:1.",
+        "text": "⌘ K",
+        "fg": "rgb(144,146,151)",
+        "bg": "rgb(255,255,255)",
+        "ratio": 3.11,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(116,118,122)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > header > div:nth-of-type(2) > label > kbd",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 1575.864501953125,
+          "y": 87.93289947509766,
+          "width": 37.3056640625,
+          "height": 19.295997619628906
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.23:1; WCAG AA requires 4.5:1.",
+        "text": "Date",
+        "fg": "rgb(118,120,125)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 4.23,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(113,115,120)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > main > section > div:nth-of-type(2) > table > thead > tr > th:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 455.4101867675781,
+          "y": 629.929443359375,
+          "width": 133.52426147460938,
+          "height": 43.737548828125
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.23:1; WCAG AA requires 4.5:1.",
+        "text": "Supplier",
+        "fg": "rgb(118,120,125)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 4.23,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(113,115,120)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > main > section > div:nth-of-type(2) > table > thead > tr > th:nth-of-type(3)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 588.9344482421875,
+          "y": 629.929443359375,
+          "width": 335.1876220703125,
+          "height": 43.737548828125
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.23:1; WCAG AA requires 4.5:1.",
+        "text": "Status",
+        "fg": "rgb(118,120,125)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 4.23,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(113,115,120)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > main > section > div:nth-of-type(2) > table > thead > tr > th:nth-of-type(4)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 924.1220703125,
+          "y": 629.929443359375,
+          "width": 183.5933837890625,
+          "height": 43.737548828125
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.23:1; WCAG AA requires 4.5:1.",
+        "text": "Amount",
+        "fg": "rgb(118,120,125)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 4.23,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(113,115,120)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > main > section > div:nth-of-type(2) > table > thead > tr > th:nth-of-type(5)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 1107.7154541015625,
+          "y": 629.929443359375,
+          "width": 133.5242919921875,
+          "height": 43.737548828125
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.23:1; WCAG AA requires 4.5:1.",
+        "text": "Invoice No.",
+        "fg": "rgb(118,120,125)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 4.23,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(113,115,120)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > main > section > div:nth-of-type(2) > table > thead > tr > th:nth-of-type(6)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 1241.23974609375,
+          "y": 629.929443359375,
+          "width": 114.04736328125,
+          "height": 43.737548828125
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.23:1; WCAG AA requires 4.5:1.",
+        "text": "Context",
+        "fg": "rgb(118,120,125)",
+        "bg": "rgb(250,250,250)",
+        "ratio": 4.23,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(113,115,120)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div > div > div > div > main > section > div:nth-of-type(2) > table > thead > tr > th:nth-of-type(7)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 1355.287109375,
+          "y": 629.929443359375,
+          "width": 418.6829833984375,
+          "height": 43.737548828125
+        },
+        "time": 11.25,
+        "times": [
+          11.25
+        ]
+      }
+    ],
+    "enabled": true,
+    "samples": [
+      1.25,
+      6.25,
+      11.25,
+      16.25,
+      21.25
+    ],
+    "checked": 86,
+    "passed": 76
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 4,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "first_frame_empty",
+        "severity": "warning",
+        "message": "Frame 0 shows only the background, and the first frame is the thumbnail on social players: have the title or key image already on screen at 0 s instead of entering from nothing; see references/review.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 3.50 s (7.38–10.88 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 7.375,
+        "seconds": 3.5,
+        "floorSeconds": 3,
+        "until": 10.875
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 66 text elements stay under it for 0.5 s or more, the smallest \"⌘ K\" at 13 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "⌘ K",
+        "selector": "label.search > kbd:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/inbox.html",
+        "bbox": {
+          "x": 1567.5,
+          "y": 108.13,
+          "width": 26.25,
+          "height": 15
+        },
+        "time": 7.375,
+        "times": [
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375,
+          7.375
+        ],
+        "fontPx": 12.5,
+        "floorPx": 28,
+        "seconds": 4.125,
+        "elements": [
+          {
+            "selector": "label.search > kbd:nth-of-type(1)",
+            "text": "⌘ K",
+            "fontPx": 12.5,
+            "time": 7.375,
+            "seconds": 4.125
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "OS",
+            "fontPx": 12.5,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "SW",
+            "fontPx": 12.5,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "OS",
+            "fontPx": 12.5,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "OS",
+            "fontPx": 12.5,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "span.company-caption",
+            "text": "Demo Logistyka sp. z o.o.",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 4.125
+          },
+          {
+            "selector": "div.platform-sync > button:nth-of-type(1)",
+            "text": "Refresh",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.summary-grid > button:nth-of-type(1) > span:nth-of-type(3)",
+            "text": "Platform records",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.summary-grid > button:nth-of-type(2) > span:nth-of-type(3)",
+            "text": "Platform records",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.summary-grid > button:nth-of-type(3) > span:nth-of-type(3)",
+            "text": "Platform records",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "button.button.button-dark",
+            "text": "All",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.dropdown > button:nth-of-type(1)",
+            "text": "Status",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-controls > button:nth-of-type(2)",
+            "text": "Add filters",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-controls > button:nth-of-type(3)",
+            "text": "Export",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(2)",
+            "text": "Date",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(3)",
+            "text": "Supplier",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(4)",
+            "text": "Status",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(5)",
+            "text": "Amount",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(6)",
+            "text": "Invoice No.",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > thead:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(7)",
+            "text": "Context",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2)",
+            "text": "Oct 06, 2026",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "ORLEN S.A.",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(4) > span:nth-of-type(1)",
+            "text": "Completed",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(5)",
+            "text": "PLN 430.50",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(6) > button:nth-of-type(1)",
+            "text": "API-1",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(7) > button:nth-of-type(1)",
+            "text": "ON Ekodiesel, tankowanie DW 1234A",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
+            "text": "Nov 03, 2026",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Softwarehouse Wrocław sp. z o.o.",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(4) > span:nth-of-type(1)",
+            "text": "Completed",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(5)",
+            "text": "PLN 2,460.00",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(6) > button:nth-of-type(1)",
+            "text": "API-2",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(7) > button:nth-of-type(1)",
+            "text": "Abonament za utrzymanie systemu IT, listopad 2026",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(2)",
+            "text": "Nov 04, 2026",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "ORLEN S.A.",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(4) > span:nth-of-type(1)",
+            "text": "Completed",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(5)",
+            "text": "PLN 369.00",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(6) > button:nth-of-type(1)",
+            "text": "API-3",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(7) > button:nth-of-type(1)",
+            "text": "ON Ekodiesel, tankowanie DW 1234A",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(2)",
+            "text": "Nov 05, 2026",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "ORLEN S.A.",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "span.status-badge.waiting_for_client",
+            "text": "Waiting for client",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(5)",
+            "text": "PLN 246.00",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(6) > button:nth-of-type(1)",
+            "text": "API-4",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-scroll > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(7) > button:nth-of-type(1)",
+            "text": "ON Ekodiesel, tankowanie GD 9R247",
+            "fontPx": 13.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "button.company-switcher > span:nth-of-type(1) > strong:nth-of-type(1)",
+            "text": "Grok Invoices",
+            "fontPx": 15,
+            "time": 7.375,
+            "seconds": 4.25
+          },
+          {
+            "selector": "div.workspace-label",
+            "text": "Workspace",
+            "fontPx": 15,
+            "time": 7.375,
+            "seconds": 4.375
+          },
+          {
+            "selector": "div.page-heading > div:nth-of-type(1) > p:nth-of-type(1)",
+            "text": "Track every invoice, question, and accounting decision.",
+            "fontPx": 15,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.platform-sync > div:nth-of-type(1) > strong:nth-of-type(1)",
+            "text": "Platform API · read only",
+            "fontPx": 15,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.platform-sync > div:nth-of-type(1) > p:nth-of-type(1)",
+            "text": "Demo company records from the platform API.",
+            "fontPx": 15,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.platform-sync > div:nth-of-type(1) > p:nth-of-type(2)",
+            "text": "Auto-refresh every 15 seconds. Last updated: 21:06:13.",
+            "fontPx": 15,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Overview",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "button.nav-item.active > span:nth-of-type(1)",
+            "text": "Invoices",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 4.5
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Questions",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(4) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Decisions",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(5) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Company context",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(6) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Agents",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 4.375
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(7) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Sources",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 4.5
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(8) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Precedents",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "aside.sidebar > nav:nth-of-type(1) > div:nth-of-type(9) > button:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Activity",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 4.375
+          },
+          {
+            "selector": "div.breadcrumb > span:nth-of-type(1)",
+            "text": "Dashboard",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 4.125
+          },
+          {
+            "selector": "div.breadcrumb > strong:nth-of-type(1)",
+            "text": "Invoices",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 4.125
+          },
+          {
+            "selector": "div.summary-grid > button:nth-of-type(1) > span:nth-of-type(2)",
+            "text": "Completed",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.summary-grid > button:nth-of-type(2) > span:nth-of-type(2)",
+            "text": "Waiting for client",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.summary-grid > button:nth-of-type(3) > span:nth-of-type(2)",
+            "text": "Needs attention",
+            "fontPx": 16.25,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.table-toolbar > h2:nth-of-type(1)",
+            "text": "All invoices",
+            "fontPx": 18.75,
+            "time": 7.375,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.page-heading > div:nth-of-type(1) > h1:nth-of-type(1)",
+            "text": "Invoices",
+            "fontPx": 25,
+            "time": 7.375,
+            "seconds": 4.125
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 3 text elements stay under it for 0.5 s or more, the smallest \"Platform invoice · read only\" at 26 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Platform invoice · read only",
+        "selector": "p.platform-eyebrow",
+        "dataAttributes": {},
+        "sourceFile": "compositions/question.html",
+        "bbox": {
+          "x": 464.21,
+          "y": 97.3,
+          "width": 333.25,
+          "height": 32.25
+        },
+        "time": 13.75,
+        "times": [
+          13.75,
+          13.75,
+          13.75
+        ],
+        "fontPx": 25.8,
+        "floorPx": 28,
+        "seconds": 5.375,
+        "elements": [
+          {
+            "selector": "p.platform-eyebrow",
+            "text": "Platform invoice · read only",
+            "fontPx": 25.8,
+            "time": 13.75,
+            "seconds": 5.375
+          },
+          {
+            "selector": "article.platform-record > p:nth-of-type(2)",
+            "text": "Opened by invoice_agent · Assignee: Unassigned",
+            "fontPx": 25.8,
+            "time": 13.75,
+            "seconds": 5.375
+          },
+          {
+            "selector": "div.platform-question > p:nth-of-type(2)",
+            "text": "Asked by regulations_agent · 2026-11-05T20:03:39.290627Z",
+            "fontPx": 25.8,
+            "time": 13.75,
+            "seconds": 5.375
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 180
+  },
+  "audio": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  },
+  "saved": {
+    "id": "55416213-ceb6-495d-a098-41e4773414ad",
+    "revision": "d908ae9d-5d5a-4887-a811-5c7955ec3bb6",
+    "report": "C:\\Users\\Admin\\Desktop\\hackathon\\grokbot-wroclaw-hackathon-2026\\brag-output-dashboard-v3\\composition\\.hyperframes\\artifacts\\checks\\55416213-ceb6-495d-a098-41e4773414ad.json",
+    "attribution": "recorded-revision"
+  },
+  "_meta": {
+    "version": "0.9.16",
+    "latestVersion": "0.9.16",
+    "updateAvailable": false,
+    "checkedAt": "2026-11-05T19:47:26.581Z"
+  }
+}

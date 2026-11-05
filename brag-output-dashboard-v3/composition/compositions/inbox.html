@@ -1,0 +1,252 @@
+<template><style>:root {
+  font-family: 'Inter', sans-serif;
+  color: #171819;
+  background:
+    radial-gradient(ellipse at 8% 12%, #9ee9f3 0%, transparent 48%),
+    radial-gradient(ellipse at 84% 8%, #b4caff 0%, transparent 48%),
+    radial-gradient(ellipse at 96% 68%, #ffd7b0 0%, transparent 50%),
+    radial-gradient(ellipse at 16% 92%, #e9bcea 0%, transparent 52%),
+    #f6f3ef;
+  background-attachment: fixed;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  font-weight: 400;
+  font-size: 13px;
+  --line: #e8e9eb;
+  --muted: #777a80;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 360px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; }
+button, a, input, select { -webkit-tap-highlight-color: transparent; }
+button { color: inherit; cursor: pointer; }
+button:disabled { cursor: default; opacity: .5; }
+button, a, input, select { outline-offset: 4px; }
+:focus-visible { outline: 2px solid #4072e8; }
+button { border: 0; }
+button, a { touch-action: manipulation; }
+button svg, a svg { flex-shrink: 0; }
+a { color: #345bba; }
+h1, h2, h3, p { margin: 0; }
+.app-shell { display: flex; position: relative; width: min(1320px, calc(100% - 96px)); min-height: calc(100dvh - 112px); margin: 56px auto; border: 8px solid #fff; border-radius: 36px; background: #fafafa; box-shadow: 0 25px 65px #27323a12; }
+.sidebar { width: 216px; flex: 0 0 216px; padding: 10px 12px 10px 8px; border-right: 1px solid var(--line); display: flex; flex-direction: column; background: #fff; border-radius: 25px 0 0 25px; }
+.company-switcher { display: flex; align-items: center; gap: 9px; text-align: left; width: 100%; padding: 7px; min-height: 46px; background: #f3f3f3; border: 1px solid #e9e9e9; border-radius: 8px; margin-bottom: 14px; }
+.company-switcher img { object-fit: contain; border-radius: 6px; }
+.company-switcher > span { display: flex; flex: 1; flex-direction: column; gap: 2px; }
+.company-caption { color: #777; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.company-switcher > span { min-width: 0; }
+.company-switcher strong { font-size: 12px; font-weight: 600; }
+.nav-item { display: flex; gap: 10px; align-items: center; width: 100%; background: transparent; padding: 9px 8px; min-height: 36px; margin-bottom: 3px; border-radius: 7px; text-align: left; font-size: 13px; }
+.nav-item > svg:first-child { color: #85878b; }
+.nav-item:hover { background: #f4f5f7; }
+.nav-item.active { color: #0750eb; background: #e3ebff; }
+.nav-item.active > svg { color: #0750eb; }
+.nav-caret { margin-left: auto; }
+.nav-item.active .nav-caret { transform: rotate(180deg); }
+.workspace-label { border-top: 1px solid var(--line); padding: 18px 2px 9px; margin-top: 12px; font-size: 12px; font-weight: 500; }
+.assistant-card { margin-top: auto; padding: 13px 11px 11px; background: #fafafa; border: 1px solid #e5e6e8; border-radius: 13px; }
+.assistant-card p { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
+.assistant-card .button { width: 100%; justify-content: center; min-height: 39px; font-size: 13px; }
+.workspace { min-width: 0; flex: 1; }
+.topbar { min-height: 59px; padding: 10px 14px 10px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.breadcrumb { display: flex; gap: 9px; white-space: nowrap; font-size: 13px; align-items: center; }
+.breadcrumb > span { color: #8c8e92; }
+.breadcrumb strong { font-weight: 500; }
+.breadcrumb-separator { font-size: 20px; font-weight: 400; }
+.topbar-actions { display: flex; align-items: center; gap: 7px; }
+.search { width: clamp(150px, 24vw, 310px); background: #f0f0f1; display: flex; align-items: center; gap: 7px; border: 1px solid #e9e9eb; border-radius: 7px; padding: 0 9px; height: 32px; color: #909297; }
+.search input { background: transparent; border: 0; min-width: 0; width: 100%; outline: none; font-size: 12px; color: #242529; height: 100%; }
+.search:focus-within { box-shadow: 0 0 0 2px #cad9ff; }
+.search input::placeholder { color: #929499; }
+.search kbd { font-family: inherit; font-size: 10px; white-space: nowrap; border-radius: 3px; background: #fff; padding: 1px 4px; }
+.icon-button, .avatar-button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0; background: #f2f2f3; color: #85878b; border: 1px solid #e9e9eb; border-radius: 7px; }
+.icon-button:hover, .avatar-button:hover { background: #e8e9ec; color: #282a2f; }
+.avatar-button { color: #514a55; background: #e9e5eb; }
+.icon-button.is-toggled { background: #e5edff; color: #255bd2; }
+.mobile-menu { display: none; }
+main { padding: 16px 15px 28px; }
+.page-heading { display: flex; gap: 16px; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+h1 { font-size: 20px; letter-spacing: -.8px; line-height: 1.3; font-weight: 600; }
+.page-heading p { color: #717378; font-size: 12px; margin-top: 3px; line-height: 1.5; }
+.heading-actions { display: flex; gap: 9px; align-items: center; }
+.demo-label { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; border: 1px solid #e3e4e7; border-radius: 7px; background: #fff; padding: 6px 9px; font-size: 11px; }
+.demo-label svg { color: #777a80; }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: 7px; padding: 6px 10px; min-height: 29px; white-space: nowrap; font-size: 11px; font-weight: 500; border: 1px solid #e5e6e8; background: #f9f9fa; border-radius: 8px; line-height: 1.3; box-shadow: 0 1px 1px #00000002; }
+.button:hover:not(:disabled) { background: #ededf0; border-color: #d5d7da; }
+.button svg { color: #73777c; }
+.button-dark { background: #242527; color: #fff; border-color: #161719; box-shadow: inset 0 1px 3px #ffffff30, 0 2px 3px #00000012; }
+.button-dark:hover:not(:disabled) { background: #3b3c40; border-color: #202124; }
+.button-dark svg { color: #fff; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+.summary-card { min-height: 127px; padding: 11px 13px 12px; display: flex; align-items: flex-start; text-align: left; flex-direction: column; border-radius: 11px; border: 1px solid #e2e4e8; background-color: #f3f6f9; background-size: cover; background-position: center; overflow: hidden;  }
+.summary-card:hover { border-color: #b1b9cd; box-shadow: 0 2px 7px #243c6520; }
+.summary-selected { border-color: #6d8ed1; box-shadow: 0 0 0 1px #6d8ed1; }
+.summary-icon { width: 29px; height: 29px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #ffffff80; margin-bottom: 7px; }
+.summary-card > strong { font-size: 23px; line-height: 1.15; letter-spacing: -.8px; font-weight: 500; }
+.summary-title { font-size: 13px; margin-top: 3px; line-height: 1.3; }
+.summary-caption { font-size: 11px; color: #70737b; margin-top: 6px; }
+.invoice-panel, .support-panel { border: 1px solid #e2e4e7; background: #fff; border-radius: 11px; }
+.table-toolbar { min-height: 49px; display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 9px 10px 9px 13px; }
+h2 { font-size: 15px; font-weight: 600; letter-spacing: -.5px; }
+.table-controls { display: flex; align-items: center; gap: 7px; }
+.table-controls > .button:first-child { min-width: 48px; }
+.filter-active { color: #2457bb; background: #edf2ff; border-color: #c9d7fb; }
+.dropdown { position: relative; }
+.dropdown-dismiss { position: fixed; inset: 0; background: transparent; cursor: default; z-index: 9; }
+.dropdown-menu { position: absolute; right: 0; top: 35px; width: 200px; z-index: 10; padding: 5px; border: 1px solid #e1e3e8; border-radius: 9px; background: #fff; box-shadow: 0 9px 30px #18203920; }
+.dropdown-menu button { display: flex; align-items: center; justify-content: space-between; width: 100%; background: #fff; padding: 9px; border-radius: 5px; text-align: left; font-size: 12px; }
+.dropdown-menu button:hover, .dropdown-menu button[aria-pressed='true'] { background: #edf2ff; color: #2457bb; }
+.table-scroll { overflow-x: auto; border-radius: 0 0 11px 11px; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; white-space: nowrap; }
+th { background: #fafafa; color: #76787d; font-weight: 400; font-size: 11px; height: 34px; border-top: 1px solid var(--line); }
+th, td { border-bottom: 1px solid var(--line); padding: 9px 12px; }
+td { height: 47px; }
+tr:last-child td { border-bottom: 0; }
+th.checkbox-cell, td.checkbox-cell { width: 31px; padding-right: 2px; padding-left: 13px; }
+input[type='checkbox'] { width: 14px; height: 14px; margin: 0; accent-color: #3167da; cursor: pointer; vertical-align: middle; }
+tbody tr:hover { background: #fafbff; }
+tbody tr.row-selected { background: #f1f5ff; }
+.supplier-button { display: flex; gap: 9px; align-items: center; background: transparent; padding: 0; text-align: left; }
+.supplier-button:disabled, .invoice-link:disabled, .context-button:disabled { opacity: 1; }
+.supplier-avatar { display: inline-flex; align-items: center; justify-content: center; width: 29px; height: 29px; background: #ededee; border-radius: 50%; font-size: 10px; flex-shrink: 0; }
+.supplier-button:hover:not(:disabled) > span:last-child, .invoice-link:hover:not(:disabled), .context-button:hover:not(:disabled) { color: #2556c5; text-decoration: underline; text-underline-offset: 3px; }
+.invoice-link, .context-button { padding: 0; background: transparent; text-align: left; font-size: inherit; }
+.status-badge { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 20px; font-size: 11px; white-space: nowrap; line-height: 1.2; }
+.completed { background: #dcefd4; color: #1c361c; }
+.waiting_for_client { background: #ffebbd; color: #46350f; }
+.blocked { background: #fbdcde; color: #4b2428; }
+.amount { font-variant-numeric: tabular-nums; }
+.empty-state { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 45px 16px; color: #757b86; }
+.empty-state h3 { color: #20232a; font-size: 15px; }
+.empty-state p { font-size: 12px; }
+.support-panel { overflow: hidden; }
+.support-heading { padding: 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.muted { color: #7b7e85; font-size: 11px; }
+.detail-row { display: flex; align-items: center; gap: 14px; padding: 18px 16px; border-bottom: 1px solid var(--line); }
+.detail-row > svg { flex-shrink: 0; color: #7f8591; }
+.detail-row > div { flex: 1; min-width: 0; }
+h3 { font-size: 13px; font-weight: 500; line-height: 1.5; }
+.detail-row p { font-size: 12px; line-height: 1.7; color: #727780; margin-top: 3px; overflow-wrap: anywhere; }
+.text-button { display: inline-flex; align-items: center; gap: 7px; background: transparent; padding: 5px 0; font-size: 11px; color: #4e6699; text-decoration: none; white-space: nowrap; }
+.text-button:hover { text-decoration: underline; }
+.context-content { padding: 30px; max-width: 650px; }
+.context-content > svg { color: #7c8699; margin-bottom: 12px; }
+.context-content h3 { font-size: 17px; margin-bottom: 10px; }
+.context-content p { line-height: 1.8; color: #737780; font-size: 13px; }
+.context-facts { display: flex; flex-wrap: wrap; gap: 25px; margin: 25px 0; }
+.context-facts > span { display: flex; flex-direction: column; gap: 8px; font-size: 11px; color: #767b85; }
+.context-facts strong { color: #30343b; font-size: 12px; font-weight: 500; }
+.neutral-badge { display: inline-block; padding: 5px 8px; background: #f0f1f4; color: #656b78; border-radius: 6px; font-size: 11px; white-space: nowrap; }
+.panel-note, .panel-empty { padding: 20px 16px; line-height: 1.7; color: #7c8089; font-size: 12px; }
+.agent-list > .button { margin: 0 16px 20px; }
+.privacy-note { display: flex; align-items: center; gap: 7px; color: #6b7483; margin-top: 16px; font-size: 11px; }
+.toast:empty { display: none; }
+.toast:not(:empty) { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #252c33; color: #fff; padding: 13px 19px; border-radius: 10px; box-shadow: 0 5px 20px #0002; z-index: 90; width: max-content; max-width: calc(100% - 32px); font-size: 12px; }
+.error-notice { position: fixed; z-index: 100; bottom: 24px; left: 50%; transform: translateX(-50%); background: #fff0f0; border: 1px solid #e6b1b1; color: #922d2d; padding: 12px; border-radius: 9px; display: flex; align-items: center; gap: 12px; }
+.modal-backdrop { position: fixed; inset: 0; background: #18213255; backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 22px; z-index: 80; }
+.dialog { width: 460px; max-width: 100%; max-height: calc(100dvh - 44px); overflow-y: auto; padding: 24px; border: 1px solid #e5e6eb; border-radius: 18px; background: #fff; box-shadow: 0 20px 80px #18213230; }
+.dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.dialog-heading h2 { font-size: 19px; }
+.dialog p { font-size: 13px; color: #727782; line-height: 1.75; margin: 14px 0; }
+.dialog-emblem { width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; background: #eef1f8; border-radius: 13px; margin-bottom: 15px; color: #5d6c8d; }
+.walkthrough-card { border: 1px solid #e4e8f0; background: #f8faff; padding: 17px; border-radius: 11px; margin-top: 20px; }
+.eyebrow { font-size: 9px; letter-spacing: 1px; font-weight: 600; color: #6c7d9e; }
+.walkthrough-card h3 { font-size: 15px; margin-top: 8px; }
+.walkthrough-card p { font-size: 12px; margin: 8px 0 15px; }
+.dialog .dialog-footnote { font-size: 11px; margin-bottom: 0; }
+.field-label { display: flex; flex-direction: column; gap: 9px; font-size: 12px; margin-top: 20px; }
+.field-label select { padding: 10px; background: #fff; border: 1px solid #dfe3ea; border-radius: 7px; color: #333944; }
+.filter-checkbox { display: grid; grid-template-columns: 18px 1fr; gap: 6px; align-items: center; margin-top: 22px; font-size: 13px; }
+.filter-checkbox span { grid-column: 2; color: #7a808b; font-size: 11px; }
+.dialog-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 25px; }
+.notification-row { padding: 14px; border: 1px solid var(--line); display: flex; align-items: center; gap: 10px; background: #fafbfc; margin-top: 10px; width: 100%; border-radius: 8px; text-align: left; }
+.notification-row span { flex: 1; }
+.notification-row:hover { background: #eef3ff; }
+.nav-backdrop { display: none; }
+@media (min-width: 1600px) { .app-shell { margin-top: 70px; min-height: calc(100dvh - 140px); } }
+@media (max-width: 1200px) {
+  .app-shell { width: calc(100% - 40px); margin: 24px auto; min-height: calc(100dvh - 48px); border-width: 6px; border-radius: 26px; }
+  .sidebar { width: 195px; flex-basis: 195px; }
+  th, td { padding-left: 9px; padding-right: 9px; }
+  table { min-width: 790px; }
+  .summary-card { min-height: 126px; }
+  .demo-label { display: none; }
+}
+@media (max-width: 900px) {
+  .app-shell { width: calc(100% - 24px); margin: 12px auto; min-height: calc(100dvh - 24px); }
+  .sidebar { width: 180px; flex-basis: 180px; }
+  .nav-item { font-size: 12px; gap: 8px; }
+  .breadcrumb > span:first-child, .breadcrumb-separator { display: none; }
+  .topbar { gap: 10px; padding: 10px 12px; }
+  .search { width: 175px; }
+  .page-heading { align-items: flex-start; }
+  .page-heading p { max-width: 240px; }
+  .summary-grid { gap: 9px; }
+  .summary-card { padding: 10px; }
+  .summary-title { font-size: 12px; }
+  .table-toolbar { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .table-controls { flex-wrap: wrap; }
+  .detail-row { flex-wrap: wrap; gap: 10px; }
+  .detail-row > div { flex-basis: calc(100% - 40px); }
+}
+@media (max-width: 680px) {
+  body { background: #fafafa; }
+  .app-shell { width: 100%; min-height: 100dvh; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+  .sidebar { position: fixed; top: 0; bottom: 0; left: 0; width: 230px; padding: 15px; border-radius: 0; z-index: 61; transform: translateX(-100%);  }
+  .sidebar.is-open { transform: translateX(0); }
+  .nav-backdrop { display: block; position: fixed; inset: 0; background: #18213255; z-index: 60; }
+  .nav-item { font-size: 13px; min-height: 40px; }
+  .mobile-menu { display: flex; background: transparent; border: 0; }
+  .topbar { min-height: 61px; gap: 7px; }
+  .breadcrumb { font-size: 12px; }
+  .topbar-actions { margin-left: auto; gap: 5px; }
+  .topbar-actions > .icon-button { width: 29px; height: 30px; }
+  .topbar-actions > .avatar-button { display: none; }
+  .search { width: clamp(104px, 28vw, 170px); height: 31px; padding: 0 6px; gap: 4px; }
+  .search kbd { display: none; }
+  main { padding: 22px 15px; }
+  .page-heading { gap: 12px; margin-bottom: 20px; }
+  .page-heading p { max-width: 210px; font-size: 11px; }
+  .heading-actions .button { font-size: 10px; padding: 7px 8px; }
+  h1 { font-size: 22px; }
+  .summary-grid { gap: 8px; margin-bottom: 18px; }
+  .summary-card { min-height: 133px; padding: 10px 8px; border-radius: 10px; }
+  .summary-title { font-size: 11px; min-height: 28px; }
+  .summary-caption { font-size: 9px; margin-top: 3px; }
+  .summary-card > strong { font-size: 24px; }
+  .summary-icon { width: 26px; height: 26px; margin-bottom: 8px; }
+  .summary-icon svg { width: 18px; height: 18px; }
+  .table-toolbar { padding: 13px 11px; }
+  .table-controls { gap: 5px; width: 100%; }
+  .table-controls .button { font-size: 10px; padding: 6px 8px; }
+  .table-controls > .button:first-child { min-width: 36px; }
+  .table-controls > .button:last-child { margin-left: auto; }
+  table { min-width: 790px; font-size: 12px; }
+  th { height: 39px; }
+  td { height: 57px; }
+  .status-badge { font-size: 11px; }
+  .support-heading { align-items: flex-start; }
+  .context-content { padding: 22px 16px; }
+  .dialog { padding: 20px; border-radius: 15px; }
+  .dialog-heading h2 { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after {  scroll-behavior: auto !important; } }
+
+/* Read-only platform dataset controls retain the selected dashboard artwork. */
+.dataset-selector { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #667067; }
+.dataset-selector select { max-width: 170px; padding: 8px 28px 8px 10px; border: 1px solid #dde3dd; border-radius: 8px; background: #fff; color: #263b2b; font: inherit; }
+.platform-sync { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; padding: 14px 18px; border: 1px solid #dfe6df; border-radius: 12px; background: #f8fbf8; font-size: 12px; }
+.platform-sync p { margin: 5px 0 0; color: #637064; line-height: 1.5; }
+.platform-sync .platform-sync-error { flex-basis: 100%; color: #943e28; }
+.status-badge.received { background: #eef1f7; color: #4a5875; }
+.status-badge.in_review { background: #f0eafa; color: #70548d; }
+.support-panel .detail-row > div { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 680px) {
+  .page-heading { flex-wrap: wrap; }
+  .heading-actions { flex-wrap: wrap; justify-content: space-between; width: 100%; }
+  .dataset-selector { flex-direction: column; align-items: flex-start; gap: 4px; font-size: 10px; }
+  .dataset-selector select { max-width: 145px; padding: 7px; }
+  .platform-sync { padding: 12px; }
+}
+.capture-window{position:absolute;inset:0;overflow:hidden} #dashboard-inner{position:absolute;left:135px;top:70px;width:1320px;transform-origin:top left} .app-shell{width:1320px;min-height:700px;margin:0}
+#root{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 8% 12%,#9ee9f3,transparent 48%),radial-gradient(ellipse at 84% 8%,#b4caff,transparent 48%),radial-gradient(ellipse at 96% 68%,#ffd7b0,transparent 50%),radial-gradient(ellipse at 16% 92%,#e9bcea,transparent 52%),#f6f3ef;font-family:Inter,sans-serif;color:#171819;} .capture-label{position:absolute;bottom:28px;left:135px;font-size:28px;color:#42464e;}</style><div id="root" data-composition-id="inbox" data-width="1920" data-height="1080"><div class="capture-window" data-layout-allow-overflow><div id="dashboard-inner"><div class="app-shell"><aside class="sidebar " aria-label="Main navigation"><button class="company-switcher"><img alt="Grok Invoices" loading="lazy" width="36" height="36" decoding="async" data-nimg="1" style="color:transparent" src="assets/logo-v2.png"><span><span class="company-caption">Demo Logistyka sp. z o.o.</span><strong>Grok Invoices</strong></span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg></button><nav><div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"></path></svg><span>Overview</span></button></div><div><button class="nav-item active" aria-current="page"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"></path></svg><span>Invoices</span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 256 256" class="nav-caret"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg></button></div><div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M168,112a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,112Zm-8,24H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16Zm72-8A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Zm-16,0A88,88,0,1,0,51.81,172.06a8,8,0,0,1,.66,6.54L40,216,77.4,203.53a7.85,7.85,0,0,1,2.53-.42,8,8,0,0,1,4,1.08A88,88,0,0,0,216,128Z"></path></svg><span>Questions</span></button></div><div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M230.91,172A8,8,0,0,1,228,182.91l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,36,169.09l92,53.65,92-53.65A8,8,0,0,1,230.91,172ZM220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09ZM24,80a8,8,0,0,1,4-6.91l96-56a8,8,0,0,1,8.06,0l96,56a8,8,0,0,1,0,13.82l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,24,80Zm23.88,0L128,126.74,208.12,80,128,33.26Z"></path></svg><span>Decisions</span></button></div><div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M240,208H224V96a16,16,0,0,0-16-16H144V32a16,16,0,0,0-24.88-13.32L39.12,72A16,16,0,0,0,32,85.34V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM208,96V208H144V96ZM48,85.34,128,32V208H48ZM112,112v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm-32,0v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm0,56v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Zm32,0v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Z"></path></svg><span>Company context</span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 256 256" class="nav-caret"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg></button></div><div><div class="workspace-label">Workspace</div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M200,48H136V16a8,8,0,0,0-16,0V48H56A32,32,0,0,0,24,80V192a32,32,0,0,0,32,32H200a32,32,0,0,0,32-32V80A32,32,0,0,0,200,48Zm16,144a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V80A16,16,0,0,1,56,64H200a16,16,0,0,1,16,16Zm-52-56H92a28,28,0,0,0,0,56h72a28,28,0,0,0,0-56Zm-24,16v24H116V152ZM80,164a12,12,0,0,1,12-12h8v24H92A12,12,0,0,1,80,164Zm84,12h-8V152h8a12,12,0,0,1,0,24ZM72,108a12,12,0,1,1,12,12A12,12,0,0,1,72,108Zm88,0a12,12,0,1,1,12,12A12,12,0,0,1,160,108Z"></path></svg><span>Agents</span></button></div><div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24C74.17,24,32,48.6,32,80v96c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm80,104c0,9.62-7.88,19.43-21.61,26.92C170.93,163.35,150.19,168,128,168s-42.93-4.65-58.39-13.08C55.88,147.43,48,137.62,48,128V111.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64ZM69.61,53.08C85.07,44.65,105.81,40,128,40s42.93,4.65,58.39,13.08C200.12,60.57,208,70.38,208,80s-7.88,19.43-21.61,26.92C170.93,115.35,150.19,120,128,120s-42.93-4.65-58.39-13.08C55.88,99.43,48,89.62,48,80S55.88,60.57,69.61,53.08ZM186.39,202.92C170.93,211.35,150.19,216,128,216s-42.93-4.65-58.39-13.08C55.88,195.43,48,185.62,48,176V159.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64V176C208,185.62,200.12,195.43,186.39,202.92Z"></path></svg><span>Sources</span></button></div><div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"></path></svg><span>Precedents</span></button></div><div><button class="nav-item "><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" viewBox="0 0 256 256"><path d="M240,128a8,8,0,0,1-8,8H204.94l-37.78,75.58A8,8,0,0,1,160,216h-.4a8,8,0,0,1-7.08-5.14L95.35,60.76,63.28,131.31A8,8,0,0,1,56,136H24a8,8,0,0,1,0-16H50.85L88.72,36.69a8,8,0,0,1,14.76.46l57.51,151,31.85-63.71A8,8,0,0,1,200,120h32A8,8,0,0,1,240,128Z"></path></svg><span>Activity</span></button></div></nav></aside><div class="workspace"><header class="topbar"><button class="icon-button mobile-menu" aria-label="Open navigation"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg></button><div class="breadcrumb"><span>Dashboard</span><span class="breadcrumb-separator">›</span><strong>Invoices</strong></div><div class="topbar-actions"><label class="search"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg><input aria-label="Search invoices" placeholder="Search..." value=""><kbd>⌘ K</kbd></label><button class="icon-button " aria-label="Hide private details" title="Hide private details" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M53.92,34.62A8,8,0,1,0,42.08,45.38L61.32,66.55C25,88.84,9.38,123.2,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208a127.11,127.11,0,0,0,52.07-10.83l22,24.21a8,8,0,1,0,11.84-10.76Zm47.33,75.84,41.67,45.85a32,32,0,0,1-41.67-45.85ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.16,133.16,0,0,1,25,128c4.69-8.79,19.66-33.39,47.35-49.38l18,19.75a48,48,0,0,0,63.66,70l14.73,16.2A112,112,0,0,1,128,192Zm6-95.43a8,8,0,0,1,3-15.72,48.16,48.16,0,0,1,38.77,42.64,8,8,0,0,1-7.22,8.71,6.39,6.39,0,0,1-.75,0,8,8,0,0,1-8-7.26A32.09,32.09,0,0,0,134,96.57Zm113.28,34.69c-.42.94-10.55,23.37-33.36,43.8a8,8,0,1,1-10.67-11.92A132.77,132.77,0,0,0,231.05,128a133.15,133.15,0,0,0-23.12-30.77C185.67,75.19,158.78,64,128,64a118.37,118.37,0,0,0-19.36,1.57A8,8,0,1,1,106,49.79,134,134,0,0,1,128,48c34.88,0,66.57,13.26,91.66,38.35,18.83,18.83,27.3,37.62,27.65,38.41A8,8,0,0,1,247.31,131.26Z"></path></svg></button><button class="icon-button" aria-label="View notifications"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path></svg></button><button class="avatar-button" aria-label="Company profile"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path></svg></button></div></header><main id="main-content"><div class="page-heading"><div><h1>Invoices</h1><p>Track every invoice, question, and accounting decision.</p></div></div><div class="platform-sync" aria-live="polite"><div><strong>Platform API · read only</strong><p>Demo company records from the platform API.</p><p>Auto-refresh every 15 seconds.<!-- --> Last updated: 21:06:13. </p></div><button class="button">Refresh</button></div><div class="summary-grid"><button class="summary-card " style="background-image:url(assets/cards/summary-completed.png)" aria-pressed="false"><span class="summary-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg></span><strong>3</strong><span class="summary-title">Completed</span><span class="summary-caption">Platform records</span></button><button class="summary-card " style="background-image:url(assets/cards/summary-waiting.png)" aria-pressed="false"><span class="summary-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path></svg></span><strong>1</strong><span class="summary-title">Waiting for client</span><span class="summary-caption">Platform records</span></button><button class="summary-card " style="background-image:url(assets/cards/summary-blocked.png)" aria-pressed="false"><span class="summary-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"></path></svg></span><strong>0</strong><span class="summary-title">Needs attention</span><span class="summary-caption">Platform records</span></button></div><section class="invoice-panel" aria-label="Invoices"><div class="table-toolbar"><h2>All invoices</h2><div class="table-controls"><button class="button button-dark">All</button><div class="dropdown"><button class="button " aria-expanded="false" aria-controls="status-options">Status<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg></button></div><button class="button "><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 256 256"><path d="M40,88H73a32,32,0,0,0,62,0h81a8,8,0,0,0,0-16H135a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16Zm64-24A16,16,0,1,1,88,80,16,16,0,0,1,104,64ZM216,168H199a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16h97a32,32,0,0,0,62,0h17a8,8,0,0,0,0-16Zm-48,24a16,16,0,1,1,16-16A16,16,0,0,1,168,192Z"></path></svg>Add filters</button><button class="button" title="Export visible or selected invoices"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"></path></svg>Export</button></div></div><div class="table-scroll"><table><thead><tr><th class="checkbox-cell"><input type="checkbox" aria-label="Select all visible invoices"></th><th>Date</th><th>Supplier</th><th>Status</th><th>Amount</th><th>Invoice No.</th><th>Context</th></tr></thead><tbody><tr class=""><td class="checkbox-cell"><input aria-label="Select API-1" type="checkbox"></td><td>Oct 06, 2026</td><td><button class="supplier-button"><span class="supplier-avatar">OS</span><span>ORLEN S.A.</span></button></td><td><span class="status-badge completed">Completed</span></td><td class="amount">PLN 430.50</td><td><button class="invoice-link">API-1</button></td><td><button class="context-button">ON Ekodiesel, tankowanie DW 1234A</button></td></tr><tr class=""><td class="checkbox-cell"><input aria-label="Select API-2" type="checkbox"></td><td>Nov 03, 2026</td><td><button class="supplier-button"><span class="supplier-avatar">SW</span><span>Softwarehouse Wrocław sp. z o.o.</span></button></td><td><span class="status-badge completed">Completed</span></td><td class="amount">PLN 2,460.00</td><td><button class="invoice-link">API-2</button></td><td><button class="context-button">Abonament za utrzymanie systemu IT, listopad 2026</button></td></tr><tr class=""><td class="checkbox-cell"><input aria-label="Select API-3" type="checkbox"></td><td>Nov 04, 2026</td><td><button class="supplier-button"><span class="supplier-avatar">OS</span><span>ORLEN S.A.</span></button></td><td><span class="status-badge completed">Completed</span></td><td class="amount">PLN 369.00</td><td><button class="invoice-link">API-3</button></td><td><button class="context-button">ON Ekodiesel, tankowanie DW 1234A</button></td></tr><tr class=""><td class="checkbox-cell"><input aria-label="Select API-4" type="checkbox"></td><td>Nov 05, 2026</td><td><button class="supplier-button"><span class="supplier-avatar">OS</span><span>ORLEN S.A.</span></button></td><td><span class="status-badge waiting_for_client">Waiting for client</span></td><td class="amount">PLN 246.00</td><td><button class="invoice-link">API-4</button></td><td><button class="context-button">ON Ekodiesel, tankowanie GD 9R247</button></td></tr></tbody></table></div></section><div class="toast" role="status" aria-live="polite"></div></main></div></div></div></div><p class="capture-label">Local fixture data · actual dashboard components</p></div><script>(()=>{const tl=gsap.timeline({paused:true});tl.fromTo("#dashboard-inner",{scale:1.25,x:0,y:0},{scale:1.25,x:0,y:0,duration:3.4},0);tl.to("#dashboard-inner",{scale:1.65,x:-310,y:-220,duration:1,ease:"power2.inOut"},3.6);window.__timelines["inbox"]=tl;})();</script></template>

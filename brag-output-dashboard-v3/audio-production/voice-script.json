@@ -1,0 +1,43 @@
+{
+  "status": "prepared_not_generated",
+  "provider": "ElevenLabs",
+  "language": "en",
+  "duration": 22.5,
+  "segments": [
+    {
+      "id": "01-hook",
+      "role": "narrator",
+      "start": 0.15,
+      "end": 3.45,
+      "text": "A fuel invoice arrives. Which car was it?"
+    },
+    {
+      "id": "02-product",
+      "role": "narrator",
+      "start": 3.75,
+      "end": 7.2,
+      "text": "Grok Invoices. An accounting workspace for AI agents."
+    },
+    {
+      "id": "03-features",
+      "role": "narrator",
+      "start": 7.55,
+      "end": 13.35,
+      "text": "Track invoices, review decisions, and see exactly where client context is missing."
+    },
+    {
+      "id": "04-micro-demo",
+      "role": "client_assistant",
+      "start": 13.8,
+      "end": 18.95,
+      "text": "Which vehicle was this fuel for? How do you use it for business?"
+    },
+    {
+      "id": "05-outro",
+      "role": "narrator",
+      "start": 19.3,
+      "end": 22.35,
+      "text": "Grok Invoices. Context before a decision."
+    }
+  ]
+}

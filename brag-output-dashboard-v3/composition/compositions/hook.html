@@ -1,0 +1,56 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    .line {
+      position: absolute;
+      left: 180px;
+      width: 1500px;
+      margin: 0;
+      font-size: 84px;
+      font-weight: 600;
+      letter-spacing: -2.6px;
+      line-height: 1.02;
+    }
+    #hook-line-1 { top: 390px; }
+    #hook-line-2 { top: 500px; }
+  
+    #root { background: #f6f3ef; overflow: hidden; }
+    .color-field { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .color-drift { position:absolute; inset:-140px;
+      background:radial-gradient(ellipse at 8% 12%,#9ee9f3 0%,transparent 48%),radial-gradient(ellipse at 84% 8%,#b4caff 0%,transparent 48%),radial-gradient(ellipse at 96% 68%,#ffd7b0 0%,transparent 50%),radial-gradient(ellipse at 16% 92%,#e9bcea 0%,transparent 52%),#f6f3ef; }
+    .progress { position:absolute; left:180px; bottom:120px; width:1560px; height:6px; border-radius:8px; overflow:hidden; background:#ffffff80; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,#0750eb,#c026d3,#e9bcea); transform-origin:left; }
+    .eyebrow { position:absolute; left:180px; top:180px; color:#24428a; font-size:30px; font-weight:700; letter-spacing:5px; }
+#hook-line-1-inner,#hook-line-2-inner{display:inline-block;} #hook-line-2-inner{color:#842094; background:#f5d9f3; padding:10px 26px 16px; border-radius:20px;}
+  .eyebrow, .progress { display:none; }
+  .lockup img{padding:0;background:transparent;box-shadow:none;border-radius:0;width:140px;height:140px;object-fit:contain}.lockup h1{color:#171819;font-weight:600} #hook-line-2-inner{background:transparent;padding:0;color:#171819} #name-sub-inner{border:0;padding:0;font-weight:400} #outro-tag-inner{background:transparent;color:#646871;padding:0;font-weight:400}</style>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+    <div class="color-field" aria-hidden="true" data-layout-ignore><div id="hook-colors" class="color-drift"></div></div>
+    <div class="progress" aria-hidden="true" data-layout-ignore><div id="hook-progress" class="progress-fill"></div></div>
+    <div class="eyebrow">THE MISSING DETAIL</div>
+    <h1 id="hook-line-1" class="clip line" data-start="0" data-duration="3.5">
+      <span id="hook-line-1-inner">A fuel invoice arrived.</span>
+    </h1>
+    <h1 id="hook-line-2" class="clip line" data-start="1.9" data-duration="1.6">
+      <span id="hook-line-2-inner">The car did not.</span>
+    </h1>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#hook-line-2-inner", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.28, ease: "power4.out" }, 1.9);
+      
+      tl.fromTo("#hook-colors", {x:-45,y:-25,scale:1.02}, {x:45,y:25,scale:1.08,duration:3.55,ease:"sine.inOut"},0);
+      tl.fromTo("#hook-progress", {scaleX:0}, {scaleX:1,duration:3.4499999999999997,ease:"none"},0);
+      tl.fromTo("#hook-line-1-inner", {x:-65,opacity:0}, {x:0,opacity:1,duration:0.55,ease:"power3.out"},0);
+      tl.fromTo("#hook-line-2-inner", {scale:0.9,rotation:-2}, {scale:1,rotation:0,duration:0.5,ease:"power2.out"},1.9);
+      window.__timelines["hook"] = tl;
+    })();
+  </script>
+</template>
