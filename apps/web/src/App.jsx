@@ -150,7 +150,7 @@ export function App() {
     {mobileNav && <button className="nav-backdrop" aria-label="Close navigation" onClick={() => setMobileNav(false)} />}
     <aside className={`sidebar ${mobileNav ? 'is-open' : ''}`} aria-label="Main navigation">
       <button className="company-switcher" onClick={() => { navigate('Company context'); }}>
-        <Image src="/assets/logo-v2.png" width={36} height={36} alt="Grok Invoices" />
+        <Image src="/assets/icon.svg" width={36} height={36} alt="Grok Invoices" />
         <span><span className="company-caption">{mask(snapshot?.client.name ?? 'Your workspace')}</span><strong>Grok Invoices</strong></span><CaretDown size={13} />
       </button>
       <nav>{navigation.map(({ label, icon: Icon, workspace }) => <div key={label}>
