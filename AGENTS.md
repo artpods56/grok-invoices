@@ -4,6 +4,7 @@
 - Keep commit messages short, simple, and descriptive.
 - The web application belongs in `apps/web/`.
 - Commit completed, coherent changes regularly and keep the project Outline document current with decisions, progress, verification, and commit references. Read the latest document before editing and preserve unrelated content.
+- Push each completed and verified commit promptly so both collaborators stay synchronized. Remember that pushing `main` triggers the production workflow.
 - Distinguish implemented behavior, verified external behavior, synthetic demo data, and proposals. Do not describe a research note as a working integration.
 - Preserve the hackathon build history. The submission requires authentic AI session exports under `/sessions`; never fabricate an export or include credentials in it.
 ## Backend conventions
