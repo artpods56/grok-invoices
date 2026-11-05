@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+.env*
+__pycache__
+*.py[cod]
+.DS_Store
+assets
+deploy
+Dockerfile
+README.md

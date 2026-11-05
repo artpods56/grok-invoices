@@ -1,0 +1,9 @@
+[project]
+name = "grok-invoices"
+version = "0.1.0"
+description = "A simple FastAPI application for Grok Invoices"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.162.0",
+    "uvicorn[standard]>=0.54.0",
+]
