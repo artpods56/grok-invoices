@@ -1,0 +1,38 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    .line {
+      position: absolute;
+      left: 180px;
+      width: 1500px;
+      margin: 0;
+      font-size: 84px;
+      font-weight: 900;
+      letter-spacing: -2.6px;
+      line-height: 1.02;
+    }
+    #hook-line-1 { top: 390px; }
+    #hook-line-2 { top: 500px; }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+    <h1 id="hook-line-1" class="clip line" data-start="0" data-duration="3.5">
+      <span id="hook-line-1-inner">A fuel invoice arrived.</span>
+    </h1>
+    <h1 id="hook-line-2" class="clip line" data-start="1.9" data-duration="1.6">
+      <span id="hook-line-2-inner">The car did not.</span>
+    </h1>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#hook-line-2-inner", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.28, ease: "power4.out" }, 1.9);
+      window.__timelines["hook"] = tl;
+    })();
+  </script>
+</template>

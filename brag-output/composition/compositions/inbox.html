@@ -1,0 +1,140 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    .shell {
+      position: absolute;
+      left: 160px;
+      top: 96px;
+      width: 1600px;
+      height: 888px;
+      background: #fafafa;
+      border: 8px solid #fff;
+      border-radius: 36px;
+      box-shadow: 0 25px 65px #27323a22;
+      display: flex;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 320px;
+      flex: 0 0 320px;
+      background: #fff;
+      border-right: 1px solid #e8e9eb;
+      padding: 22px 16px;
+    }
+    .company { display: flex; align-items: center; gap: 12px; background: #f3f3f3; border: 1px solid #e9e9e9; border-radius: 10px; padding: 10px; }
+    .company img { width: 36px; height: 36px; }
+    .company small { display: block; color: #3a3d42; font-size: 28px; line-height: 1.1; }
+    .company strong { font-size: 28px; font-weight: 700; line-height: 1.1; }
+    .nav { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; }
+    .nav span { display: block; padding: 10px 12px; border-radius: 8px; font-size: 28px; font-weight: 500; color: #3a3d42; line-height: 1.1; }
+    .nav .on { background: #e3ebff; color: #0b3d9c; font-weight: 700; }
+    .main { position: relative; flex: 1; min-width: 0; padding: 28px 28px 0; }
+    .main h1 { margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -1px; }
+    .main .sub { margin: 8px 0 0; color: #3a3d42; font-size: 28px; font-weight: 500; letter-spacing: -0.4px; }
+    .card, .row { position: absolute; }
+    #card-1 { left: 24px; top: 148px; }
+    #card-2 { left: 406px; top: 148px; }
+    #card-3 { left: 788px; top: 148px; }
+    .face {
+      width: 370px;
+      height: 176px;
+      border-radius: 16px;
+      border: 1px solid #e2e4e8;
+      padding: 22px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background-position: center top;
+      background-size: cover;
+    }
+    #card-1-inner { background-image: linear-gradient(#ffffff00 20%, #ffffff 62%), url("assets/cards/summary-completed.png"); }
+    #card-2-inner { background-image: linear-gradient(#ffffff00 20%, #ffffff 62%), url("assets/cards/summary-waiting.png"); }
+    #card-3-inner { background-image: linear-gradient(#ffffff00 20%, #ffffff 62%), url("assets/cards/summary-blocked.png"); }
+    .face b { font-size: 48px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
+    .face em { margin-top: 8px; font-style: normal; font-size: 28px; font-weight: 700; letter-spacing: -0.4px; }
+    #row { left: 24px; top: 352px; width: 1134px; }
+    .row-face {
+      background: #fff;
+      border: 1px solid #e2e4e7;
+      border-radius: 14px;
+      min-height: 112px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 18px;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #ededee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex: 0 0 48px;
+    }
+    .who { display: flex; flex-direction: column; gap: 2px; width: 420px; flex: 0 0 420px; }
+    .who strong { font-size: 28px; font-weight: 700; letter-spacing: -0.4px; }
+    .who span, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 28px; color: #3a3d42; }
+    .amount { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; width: 230px; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 28px; font-weight: 700; color: #171819; }
+    .badge { background: #ffebbd; color: #46350f; border-radius: 999px; padding: 8px 16px; font-size: 28px; font-weight: 700; }
+    .context { font-size: 28px; font-weight: 700; }
+  </style>
+  <div id="root" data-composition-id="inbox" data-width="1920" data-height="1080">
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="company">
+          <img src="assets/icon.svg" alt="" />
+          <span><small>Demo company</small><strong>Grok Invoices</strong></span>
+        </div>
+        <div class="nav">
+          <span>Overview</span>
+          <span class="on">Invoices</span>
+          <span>Questions</span>
+          <span>Decisions</span>
+        </div>
+      </aside>
+      <div class="main">
+        <h1>Invoices</h1>
+        <p class="sub">Track every invoice, question, and accounting decision.</p>
+        <div id="card-1" class="clip card" data-start="0.44" data-duration="5.66">
+          <div id="card-1-inner" class="face"><b>2</b><em>Completed</em></div>
+        </div>
+        <div id="card-2" class="clip card" data-start="1.38" data-duration="4.72">
+          <div id="card-2-inner" class="face"><b>1</b><em>Waiting for client</em></div>
+        </div>
+        <div id="card-3" class="clip card" data-start="2.48" data-duration="3.62">
+          <div id="card-3-inner" class="face"><b>1</b><em>Blocked</em></div>
+        </div>
+        <div id="row" class="clip row" data-start="3.58" data-duration="2.52">
+          <div id="row-inner" class="row-face">
+            <div class="avatar">DF</div>
+            <div class="who"><strong>Demo Fuel Station</strong><span class="context">Unknown vehicle</span></div>
+            <span class="amount">PLN 246.00<span class="mono">2026-11-05</span></span>
+            <span class="badge">Waiting for client</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      // beat-grid: card 1 at 7.79s, card 2 at 8.73s, card 3 at 9.83s, row at 10.93s
+      tl.fromTo("#card-1-inner", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "power4.out" }, 0.44);
+      tl.fromTo("#card-2-inner", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "power4.out" }, 1.38);
+      tl.fromTo("#card-3-inner", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "power4.out" }, 2.48);
+      tl.fromTo("#row-inner", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "power4.out" }, 3.58);
+      window.__timelines["inbox"] = tl;
+    })();
+  </script>
+</template>

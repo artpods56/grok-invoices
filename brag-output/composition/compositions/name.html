@@ -1,0 +1,49 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    #name-lockup, #name-sub { position: absolute; left: 180px; width: 1500px; }
+    #name-lockup { top: 360px; }
+    #name-sub { top: 560px; margin: 0; }
+    .lockup { display: flex; align-items: center; gap: 28px; }
+    .lockup img { width: 104px; height: 104px; display: block; }
+    .lockup h1 {
+      margin: 0;
+      font-size: 92px;
+      font-weight: 900;
+      letter-spacing: -3px;
+      line-height: 0.95;
+    }
+    #name-sub-inner {
+      display: block;
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.2;
+    }
+  </style>
+  <div id="root" data-composition-id="name" data-width="1920" data-height="1080">
+    <div id="name-lockup" class="clip" data-start="0.06" data-duration="3.68">
+      <div id="name-lockup-inner" class="lockup">
+        <img src="assets/icon.svg" alt="Grok Invoices" />
+        <h1>Grok Invoices</h1>
+      </div>
+    </div>
+    <p id="name-sub" class="clip" data-start="1.09" data-duration="2.65">
+      <span id="name-sub-inner">Agents book purchase invoices from KSeF.</span>
+    </p>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#name-lockup-inner", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power4.out" }, 0.06);
+      tl.fromTo("#name-sub-inner", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.26, ease: "power4.out" }, 1.09);
+      window.__timelines["name"] = tl;
+    })();
+  </script>
+</template>

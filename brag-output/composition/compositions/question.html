@@ -1,0 +1,50 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    #q-panel { position: absolute; left: 220px; top: 200px; width: 1480px; }
+    .panel {
+      background: #fff;
+      border: 1px solid #e2e4e7;
+      border-radius: 24px;
+      padding: 48px 56px 40px;
+      box-shadow: 0 18px 50px #27323a14;
+    }
+    .meta { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+    .id { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 28px; font-weight: 700; color: #3a3d42; }
+    .badge { background: #ffebbd; color: #46350f; border-radius: 999px; padding: 8px 16px; font-size: 28px; font-weight: 700; }
+    .await { font-size: 28px; font-weight: 600; color: #3a3d42; }
+    h2 { margin: 0; font-size: 44px; font-weight: 700; letter-spacing: -1.2px; line-height: 1.2; max-width: 1320px; }
+    #q-reason { margin: 36px 0 0; padding-top: 28px; border-top: 1px solid #e8e9eb; }
+    #q-reason-inner { display: block; font-size: 32px; font-weight: 700; letter-spacing: -0.6px; line-height: 1.25; }
+  </style>
+  <div id="root" data-composition-id="question" data-width="1920" data-height="1080">
+    <div id="q-panel" class="clip" data-start="0.08" data-duration="5.4">
+      <div id="q-panel-inner" class="panel">
+        <div class="meta">
+          <span class="id">DEMO-003</span>
+          <span class="badge">Waiting for client</span>
+          <span class="await">Demo Fuel Station · Awaiting context</span>
+        </div>
+        <h2>Which vehicle does this fuel purchase concern, how is it used, and what was the business purpose?</h2>
+        <p id="q-reason" class="clip" data-start="2.26" data-duration="3.2">
+          <span id="q-reason-inner">No tax treatment is inferred from the supplier.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#q-panel-inner", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.28, ease: "power4.out" }, 0.08);
+      // beat-locked: 15.82s
+      tl.fromTo("#q-reason-inner", { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.24, ease: "power4.out" }, 2.26);
+      window.__timelines["question"] = tl;
+    })();
+  </script>
+</template>

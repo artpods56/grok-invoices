@@ -1,0 +1,2 @@
+We built Grok Invoices so a fuel invoice can ask which car it was.
+Agents book purchase invoices from KSeF. No tax treatment is inferred from the supplier.
