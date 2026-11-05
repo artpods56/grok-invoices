@@ -1,30 +1,53 @@
 <p align="center">
-  <img src="assets/readme/hero.png" alt="Grok Invoices — your agents’ accounting workspace" width="100%">
+  <img src="assets/readme/hero.png" alt="Grok Invoices — your accounting team, through Grok Bots" width="100%">
 </p>
 
 <p align="center">
-  <a href="https://grok.stackinghq.com">Open dashboard</a> ·
-  <a href="https://grok.stackinghq.com/docs">Explore the API</a> ·
+  <a href="#your-business-in-a-grok-bot">How it works</a> ·
   <a href="docs/grok-bot-setup.md">Connect your bots</a> ·
+  <a href="https://grok.stackinghq.com">Open dashboard</a> ·
   <a href="#run-locally">Run locally</a>
 </p>
 
 ---
 
-## Accounting, with context
+## Your business, in a Grok Bot
 
-The demo follows a fuel invoice for an unfamiliar vehicle, `GD 9R247`: open a case, ask the client for the missing facts, and keep the answer with the resulting decision.
+**Talk to your personal assistant in Grok Bot.** Share company facts and documents, answer questions about purchases, and ask where your invoices stand. Specialist Grok Bots work through the accounting cases on a shared platform.
 
-**Grok Invoices is the agents’ office:** a shared platform for KSeF purchase invoices, company context, accounting decisions and their history. The agents run as Grok Bots over dedicated MCP connections. The platform stores state and enforces rules; it never calls a model itself.
+<p align="center">
+  <img src="assets/readme/client-experience.png" alt="Client journey: connect your company with NIP and a private KSeF vault flow; answer a question about an ORLEN invoice for 246 PLN and vehicle GD 9R247; the assistant saves the answer for review; ask for current progress in chat." width="100%">
+</p>
 
-| Invoice agent | Regulations agent | Client assistant |
+1. **Connect and share context.** Provide your NIP and company name. Pass the KSeF token through the private vault-to-tool flow. Send contracts, vehicle details or other company notes to your assistant.
+2. **Answer a concrete question.** A fuel invoice mentions an unfamiliar car. The assistant asks which vehicle it was, how it is used and what the purchase was for. Your words go back to the matching case for review.
+3. **Ask for progress.** Get invoice counts and outstanding questions in chat. Inspect recorded decisions and sources in the dashboard. When Grok Bot Pages is available, request a summary Page with the platform source and refresh time.
+
+The assistant collects and relays information. The accounting agents choose the treatment; a saved answer returns the case to review. The client assistant currently receives counts and onboarding status, while detailed accounting rationale remains in the dashboard.
+
+## The team behind your assistant
+
+<p align="center">
+  <img src="assets/readme/grok-bot-team.png" alt="You talk with the Client Assistant. The Invoice Agent handles invoice intake and precedents; the Regulations Agent investigates cases and sources. All three run as Grok Bots and use separate MCP connections to one shared Grok Invoices platform." width="100%">
+</p>
+
+**Grok Invoices is the agents’ office.** It keeps invoices, company facts, questions, decisions and their history together. Each Grok Bot connects through its own MCP. The platform stores state and enforces rules; the bots do the reasoning.
+
+| Your client assistant | Invoice Agent | Regulations Agent |
 | :--- | :--- | :--- |
-| Brings invoices in, checks applicable precedents and escalates unfamiliar cases. | Works through context and sources, asks for missing facts and records the rationale. | Collects documents and answers, then explains the results to the client. |
-| [Bot instructions →](apps/api/invoice-agent-template.md) | [Bot instructions →](apps/api/regulations-agent-template.md) | [Bot instructions →](apps/api/client-agent-template.md) |
+| Your conversation, documents, questions and progress. | Invoice intake, applicable precedents and escalation. | Company context, official sources and recorded decisions. |
+| [Assistant instructions →](apps/api/client-agent-template.md) | [Invoice instructions →](apps/api/invoice-agent-template.md) | [Regulations instructions →](apps/api/regulations-agent-template.md) |
 
-The client talks to a Grok Bot; the dashboard provides supervision. This is a **single-company hackathon demo using KSeF TEST**. The Polish stage demo uses chat and narrates the planned phone interaction. Each bot pass is requested explicitly: saving an answer reopens the platform case, but does not wake another bot. End-to-end Grok Bot, private vault and Pages acceptance remains outstanding in the project notes.
+<details>
+<summary><strong>What the current demo supports</strong></summary>
 
-## A calm view of every case
+The illustrations explain the client workflow using synthetic example dialogue; they are not screenshots of an accepted live Grok Bot session. The server tools, shared-state workflow and read-only dashboard are implemented. Real Grok Bot connections, private vault transfer and Pages still require end-to-end acceptance in the project notes.
+
+This is a **single-company hackathon demo using KSeF TEST**. Each bot pass is requested explicitly. Saving an answer reopens the case; it does not wake another bot. A Page is a requested presentation of retrieved state, with its source and refresh time; automatic refresh is unverified. The Polish stage demo uses chat and narrates the planned phone interaction.
+
+</details>
+
+## A dashboard for the details
 
 <p align="center">
   <img src="assets/design/dashboard-f-mockup-logo-v2.png" alt="Dashboard design with the pastel Grok Invoices logo, summary cards and invoice table" width="100%">
@@ -32,7 +55,7 @@ The client talks to a Grok Bot; the dashboard provides supervision. This is a **
   <sub>Selected design mockup with updated branding · synthetic example data · not a screenshot of production activity.</sub>
 </p>
 
-Search, filter, export CSV, or inspect the recorded posting, source and case history behind an invoice. The **Next.js + Tailwind dashboard** is a read-only view of the shared platform. A status card is a view of a record, not proof that a bot or external integration completed successfully.
+Use the **read-only dashboard** to search invoices, filter, export CSV and inspect recorded postings, sources, questions and case history. Grok Bot remains the client conversation; the dashboard provides the supporting detail.
 
 | Workspace | Agent access | Platform | Invoice intake |
 | :--- | :--- | :--- | :--- |
