@@ -6,11 +6,21 @@ from decimal import Decimal
 from ksef2.fa3 import KsefInvoice
 from pydantic import BaseModel, ConfigDict, Field
 
-from grok_invoices.domain.models import Case, InvoiceStatus, Posting, Question
+from grok_invoices.domain.models import Account, Case, Fact, InvoiceStatus, Posting, Question, Vehicle
 
 
 class View(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
+
+class ClientProfile(View):
+    """What's safe to return about the client. Reads are public, so contact details and secrets stay out."""
+
+    name: str
+    nip: str
+    fleet: list[Vehicle]
+    facts: list[Fact]
+    accounts: list[Account]
 
 
 class InvoiceSummary(View):

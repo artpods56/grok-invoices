@@ -71,7 +71,8 @@ rolls back to the previous one.
 - Build against the existing API. The contract is at `/docs` and `/openapi.json`. Don't add a
   second store of invoices, cases or precedents.
 - Writes need `Authorization: Bearer $PLATFORM_API_KEY`. Reads are public, so store only demo
-  data, and never commit secrets. On the server, secrets are in `/srv/grok-invoices/.env`;
+  data, never return secrets or contact details (return a view, like `ClientProfile`, rather
+  than the model that holds them), and never commit secrets. On the server, secrets are in `/srv/grok-invoices/.env`;
   read them through `settings.py`.
 - The server is shared with other services. Touch only `/srv/grok-invoices`.
 - Don't use `from __future__` imports.

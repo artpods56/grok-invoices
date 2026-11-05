@@ -6,9 +6,11 @@ from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Query, R
 from fastapi.responses import JSONResponse, Response
 
 from grok_invoices.domain.errors import Conflict, DomainError, Invalid, KsefUnavailable, NotFound
-from grok_invoices.domain.models import Account, Case, Client, Event, InvoiceStatus, CaseStatus, Posting, Question, QuestionStatus
+from grok_invoices.domain.models import Account, Case, CaseStatus, Event, InvoiceStatus, Posting, Question, QuestionStatus
 from grok_invoices.service_layer import commands, services
-from grok_invoices.service_layer.views import CaseDetail, InvoiceDetail, InvoiceSummary, IssuedInvoice, PrecedentMatch
+from grok_invoices.service_layer.views import (
+    CaseDetail, ClientProfile, InvoiceDetail, InvoiceSummary, IssuedInvoice, PrecedentMatch,
+)
 from grok_invoices.settings import get_settings
 
 _STATUS_BY_ERROR = {NotFound: 404, Conflict: 409, Invalid: 422, KsefUnavailable: 502}
@@ -28,17 +30,17 @@ def require_api_key(request: Request, authorization: str | None = Header(default
 router = APIRouter(prefix="/api", dependencies=[Depends(require_api_key)])
 
 
-@router.get("/client", response_model=Client, tags=["client"])
+@router.get("/client", response_model=ClientProfile, tags=["client"])
 def get_client():
     return services.get_client()
 
 
-@router.post("/client/facts", response_model=Client, status_code=201, tags=["client"])
+@router.post("/client/facts", response_model=ClientProfile, status_code=201, tags=["client"])
 def add_fact(body: commands.AddFact):
     return services.add_fact(body)
 
 
-@router.put("/client/vehicles", response_model=Client, tags=["client"])
+@router.put("/client/vehicles", response_model=ClientProfile, tags=["client"])
 def save_vehicle(body: commands.SaveVehicle):
     return services.save_vehicle(body)
 

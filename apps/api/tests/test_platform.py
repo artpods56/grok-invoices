@@ -203,6 +203,18 @@ def test_writes_need_the_key_and_reads_do_not(api):
     assert api.get("/api/invoices", headers={"Authorization": ""}).status_code == 200
 
 
+def test_public_reads_never_expose_the_client_phone(api, monkeypatch):
+    monkeypatch.setenv("DEMO_CLIENT_PHONE", "+48123456789")
+    api.post("/api/demo/reset")
+    for response in (
+        api.get("/api/client"),
+        api.put("/api/client/vehicles", json={"plate": "X1", "model": "Y", "usage": "mixed"}),
+        api.post("/api/client/facts", json={"key": "k", "value": "v"}),
+    ):
+        assert "+48123456789" not in response.text
+        assert "phone" not in response.json()
+
+
 def test_reset_restores_the_seed_but_event_ids_keep_counting(api):
     synced(api)
     last_event = api.get("/api/events").json()[-1]["id"]

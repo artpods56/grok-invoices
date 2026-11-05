@@ -11,14 +11,16 @@ from grok_invoices import ksef, seed
 from grok_invoices.domain import rules
 from grok_invoices.domain.errors import Conflict
 from grok_invoices.domain.models import (
-    Account, Actor, Case, Client, Event, EventType, Fact, Invoice, Posting, Question, QuestionStatus, ReceivedDocument,
+    Account, Actor, Case, Event, EventType, Fact, Invoice, Posting, Question, QuestionStatus, ReceivedDocument,
     Vehicle,
 )
 from grok_invoices.service_layer.commands import (
     AddFact, AnswerQuestion, AskClient, CorrectPosting, Escalate, PostInvoice, SaveVehicle,
 )
 from grok_invoices.service_layer.unit_of_work import UnitOfWork, init_store
-from grok_invoices.service_layer.views import CaseDetail, InvoiceDetail, InvoiceSummary, IssuedInvoice, PrecedentMatch
+from grok_invoices.service_layer.views import (
+    CaseDetail, ClientProfile, InvoiceDetail, InvoiceSummary, IssuedInvoice, PrecedentMatch,
+)
 
 KsefSource = Literal["fixtures", "test"]
 
@@ -66,24 +68,24 @@ def reset_demo() -> None:
 
 # --- Client context ---
 
-def get_client() -> Client:
+def get_client() -> ClientProfile:
     with UnitOfWork(write=False) as uow:
-        return uow.client
+        return ClientProfile.model_validate(uow.client)
 
 
 def list_accounts() -> list[Account]:
     return get_client().accounts
 
 
-def add_fact(command: AddFact) -> Client:
+def add_fact(command: AddFact) -> ClientProfile:
     with UnitOfWork() as uow:
         client = uow.client
         client.add_fact(Fact(key=command.key, value=command.value, source=command.source, created_at=_now()))
         _log(uow, command.source, "client_fact_added", f"Nowy fakt o firmie: {command.key} = {command.value}", key=command.key)
-        return client
+        return ClientProfile.model_validate(client)
 
 
-def save_vehicle(command: SaveVehicle) -> Client:
+def save_vehicle(command: SaveVehicle) -> ClientProfile:
     with UnitOfWork() as uow:
         client = uow.client
         client.save_vehicle(Vehicle(plate=command.plate, model=command.model, usage=command.usage))
@@ -91,7 +93,7 @@ def save_vehicle(command: SaveVehicle) -> Client:
             uow, command.actor, "vehicle_saved", f"Flota: {command.plate} ({command.model}, użytek: {command.usage})",
             plate=command.plate,
         )
-        return client
+        return ClientProfile.model_validate(client)
 
 
 # --- Invoices ---

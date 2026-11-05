@@ -35,13 +35,15 @@ def test_an_exception_rolls_back_everything_in_the_block():
             uow.events.add(Event(at=services._now(), actor="system", type="demo_reset", summary="x"))
             raise RuntimeError
     assert len(services.list_events()) == before
-    assert services.get_client().phone != "+48999"
+    with UnitOfWork(write=False) as uow:
+        assert uow.client.phone != "+48999"
 
 
 def test_a_read_only_unit_of_work_never_persists_changes():
     with UnitOfWork(write=False) as uow:
         uow.client.phone = "+48777"
-    assert services.get_client().phone != "+48777"
+    with UnitOfWork(write=False) as uow:
+        assert uow.client.phone != "+48777"
 
 
 def test_a_stored_invoice_reloads_with_its_ksef_document():
