@@ -1,0 +1,43 @@
+.case-overlay { position: fixed; inset: 0; z-index: 100; display: flex; justify-content: flex-end; background: rgb(24 28 34 / 22%); overscroll-behavior: contain; }
+.case-drawer { box-sizing: border-box; display: flex; flex-direction: column; width: min(100%, 520px); height: 100%; height: 100dvh; background: #fff; color: #22252b; box-shadow: -8px 0 40px rgb(23 28 36 / 10%); font-family: Inter, sans-serif; font-size: 13px; line-height: 1.55; }
+.case-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid #ebebee; flex-shrink: 0; }
+.case-eyebrow { margin: 0 0 2px; color: #73757c; font-size: 12px; }
+.case-header h2 { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -.5px; }
+.case-close { display: flex; align-items: center; gap: 10px; border: 1px solid #e5e5e9; border-radius: 8px; background: #fafafa; padding: 8px 12px; color: #33363b; font: inherit; cursor: pointer; }
+.case-close span { font-size: 21px; line-height: 1; }
+.case-content { overflow-y: auto; overscroll-behavior: contain; padding: 20px 24px 32px; }
+.case-notice { margin: 0 0 20px; padding: 12px 14px; border: 1px solid #dbe6f7; border-radius: 8px; background: #f4f8ff; color: #3d506e; font-size: 12px; }
+.case-section { padding: 18px 0; border-top: 1px solid #ededf0; }
+.case-section h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+.case-section p { margin: 8px 0; overflow-wrap: anywhere; }
+.case-section-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+.case-section-heading h3 { margin: 0; }
+.case-status { display: inline-flex; padding: 3px 10px; border-radius: 30px; white-space: nowrap; font-size: 12px; }
+.case-status-completed { background: #dcefd4; color: #294126; }
+.case-status-waiting_for_client { background: #ffebc0; color: #5c4214; }
+.case-status-blocked { background: #fbd9da; color: #712d32; }
+.case-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin: 0; }
+.case-facts dt { color: #73757c; font-size: 12px; }
+.case-facts dd { margin: 3px 0 0; overflow-wrap: anywhere; }
+.case-gross, .case-wide { grid-column: 1 / -1; }
+.case-gross dd { font-size: 21px; font-weight: 600; letter-spacing: -.5px; }
+.case-muted, .case-required { color: #646871; font-size: 12px; }
+.case-form { display: grid; gap: 7px; margin-top: 16px; }
+.case-form label { margin-top: 6px; font-size: 12px; font-weight: 500; }
+.case-form input, .case-form select, .case-form textarea { box-sizing: border-box; width: 100%; min-height: 40px; border: 1px solid #dcdde2; border-radius: 7px; background: #fff; color: #22252b; padding: 9px 11px; font: inherit; }
+.case-form textarea { resize: vertical; }
+.case-form [aria-invalid="true"] { border-color: #b63740; }
+.case-error { color: #a62430; font-size: 12px; }
+.case-submit { min-height: 40px; border: 1px solid #1f2226; border-radius: 8px; background: linear-gradient(#373a3e, #101113); color: white; padding: 9px 14px; font: inherit; cursor: pointer; }
+.case-submit:disabled { opacity: .65; cursor: default; }
+.case-drawer :is(button, input, select, textarea, a):focus-visible { outline: 2px solid #295bd9; outline-offset: 3px; }
+.case-sources { list-style: none; padding: 0; margin: 0; }
+.case-sources li + li { margin-top: 14px; }
+.case-sources a { color: #2358b6; text-decoration: underline; text-underline-offset: 3px; }
+.case-timeline { list-style: none; padding: 0 0 0 12px; margin: 18px 0 0 4px; border-left: 1px solid #e0e3e9; }
+.case-timeline li { position: relative; padding: 0 0 18px 9px; }
+.case-timeline li::before { content: ''; position: absolute; left: -16px; top: 5px; width: 6px; height: 6px; border-radius: 50%; border: 1px solid #b8c8e4; background: #edf3ff; }
+.case-timeline h4 { margin: 3px 0 0; font-size: 13px; font-weight: 500; }
+.case-timeline p, .case-step { color: #646871; font-size: 12px; }
+.case-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 540px) { .case-header { padding: 16px; } .case-content { padding: 16px 16px 28px; } .case-close { min-height: 44px; } }
