@@ -47,6 +47,16 @@ This is a **single-company hackathon demo using KSeF TEST**. Each bot pass is re
 
 </details>
 
+## Watch the demo
+
+https://github.com/user-attachments/assets/b3e78270-5934-4f85-8f45-1fe79905c6b3
+
+Press play to watch here. Turn on sound in the player for the narration and music.
+
+[Play or download the video (MP4, 24 seconds)](https://github.com/artpods56/grok-invoices/raw/refs/heads/preview/narrated-dashboard-demo/brag-output-dashboard-v3/narrated.mp4)
+
+Actual dashboard components with synthetic fixture data. English narration, a distinct client-assistant voice in the micro-demo, and calm instrumental music generated with ElevenLabs. This is a scripted product illustration, not a recording of a live bot conversation or KSeF transaction.
+
 ## A dashboard for the details
 
 <p align="center">

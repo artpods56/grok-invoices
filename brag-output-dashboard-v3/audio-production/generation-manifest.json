@@ -1,0 +1,50 @@
+{
+  "provider": "ElevenLabs MCP",
+  "flow_id": "79ewMAhxZEGXTmBX7Ak1",
+  "models": {
+    "speech": "eleven_v4",
+    "music": "eleven_music_v2"
+  },
+  "voices": {
+    "narrator": {
+      "name": "George",
+      "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+    },
+    "client_assistant": {
+      "name": "Jessica",
+      "voice_id": "cgSgspJ2msm6clMCkdW9"
+    }
+  },
+  "selected_generations": [
+    {
+      "key": "hook",
+      "id": "J5l7mO2b4lTj1HNQN0tZ",
+      "duration": 3.04
+    },
+    {
+      "key": "product",
+      "id": "HCTZMe5NaBk6KIBtIF58",
+      "duration": 3.68
+    },
+    {
+      "key": "features",
+      "id": "582yWptzYU02rEsYbREk",
+      "duration": 5.04
+    },
+    {
+      "key": "micro",
+      "id": "CtvPsW1f9QOIeO4CNe3O",
+      "duration": 4.16
+    },
+    {
+      "key": "outro",
+      "id": "8xN6le2P6lUwGxpwFMXF",
+      "duration": 3.92
+    }
+  ],
+  "music": {
+    "generation_id": "kn9FiUgDaJ7Yn6K3HIo9",
+    "duration": 23
+  },
+  "verification": "Speech timing and automated transcription checked; no claim of live bot audio."
+}
