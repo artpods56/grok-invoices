@@ -1,0 +1,53 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    #outro-lockup, #outro-tag { position: absolute; left: 0; width: 1920px; text-align: center; }
+    #outro-lockup { top: 330px; }
+    #outro-tag { top: 640px; margin: 0; }
+    .lockup img { width: 112px; height: 112px; display: block; margin: 0 auto 28px; }
+    .lockup h1 { margin: 0; font-size: 92px; font-weight: 900; letter-spacing: -3px; line-height: 0.95; }
+    #outro-tag-inner { display: inline-block; font-size: 40px; font-weight: 700; letter-spacing: -0.8px; }
+  
+    #root { background: #f6f3ef; overflow: hidden; }
+    .color-field { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .color-drift { position:absolute; inset:-140px;
+      background:radial-gradient(ellipse at 8% 12%,#9ee9f3 0%,transparent 48%),radial-gradient(ellipse at 84% 8%,#b4caff 0%,transparent 48%),radial-gradient(ellipse at 96% 68%,#ffd7b0 0%,transparent 50%),radial-gradient(ellipse at 16% 92%,#e9bcea 0%,transparent 52%),#f6f3ef; }
+    .progress { position:absolute; left:180px; bottom:120px; width:1560px; height:6px; border-radius:8px; overflow:hidden; background:#ffffff80; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,#0750eb,#c026d3,#e9bcea); transform-origin:left; }
+    .eyebrow { position:absolute; left:180px; top:180px; color:#24428a; font-size:30px; font-weight:700; letter-spacing:5px; }
+.lockup h1{color:#123f9b;} .lockup img{padding:14px;background:white;border-radius:28px;box-shadow:0 20px 65px #c026d335;} #outro-tag-inner{padding:16px 34px;background:#123f9b;color:white;border-radius:50px;}
+  .eyebrow, .progress { display:none; }
+  </style>
+  <div id="root" data-composition-id="outro" data-width="1920" data-height="1080">
+    <div class="color-field" aria-hidden="true" data-layout-ignore><div id="outro-colors" class="color-drift"></div></div>
+    <div class="progress" aria-hidden="true" data-layout-ignore><div id="outro-progress" class="progress-fill"></div></div>
+    <div id="outro-lockup" class="clip" data-start="0.06" data-duration="3.28">
+      <div id="outro-lockup-inner" class="lockup">
+        <img src="assets/icon.svg" alt="Grok Invoices" />
+        <h1>Grok Invoices</h1>
+      </div>
+    </div>
+    <p id="outro-tag" class="clip" data-start="1.09" data-duration="2.25">
+      <span id="outro-tag-inner">Agent as a Service.</span>
+    </p>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#outro-lockup-inner", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.28, ease: "power4.out" }, 0.06);
+      // beat-locked: 20.19s
+      tl.fromTo("#outro-tag-inner", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.24, ease: "power4.out" }, 1.09);
+      
+      tl.fromTo("#outro-colors", {x:-45,y:-25,scale:1.02}, {x:45,y:25,scale:1.08,duration:3.4,ease:"sine.inOut"},0);
+      tl.fromTo("#outro-progress", {scaleX:0}, {scaleX:1,duration:3.3,ease:"none"},0);
+      tl.fromTo("#outro-lockup-inner img", {rotation:-14,scale:0.7}, {rotation:0,scale:1,duration:0.65,ease:"back.out(1.8)"},0.06);
+      window.__timelines["outro"] = tl;
+    })();
+  </script>
+</template>

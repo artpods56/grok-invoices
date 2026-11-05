@@ -1,0 +1,68 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    #q-panel { position: absolute; left: 220px; top: 200px; width: 1480px; }
+    .panel {
+      background: #fff;
+      border: 1px solid #e2e4e7;
+      border-radius: 24px;
+      padding: 48px 56px 40px;
+      box-shadow: 0 18px 50px #27323a14;
+    }
+    .meta { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+    .id { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 28px; font-weight: 700; color: #3a3d42; }
+    .badge { background: #ffebbd; color: #46350f; border-radius: 999px; padding: 8px 16px; font-size: 28px; font-weight: 700; }
+    .await { font-size: 28px; font-weight: 600; color: #3a3d42; }
+    h2 { margin: 0; font-size: 44px; font-weight: 700; letter-spacing: -1.2px; line-height: 1.2; max-width: 1320px; }
+    #q-reason { margin: 36px 0 0; padding-top: 28px; border-top: 1px solid #e8e9eb; }
+    #q-reason-inner { display: block; font-size: 32px; font-weight: 700; letter-spacing: -0.6px; line-height: 1.25; }
+  
+    #root { background: #f6f3ef; overflow: hidden; }
+    .color-field { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .color-drift { position:absolute; inset:-140px;
+      background:radial-gradient(ellipse at 8% 12%,#9ee9f3 0%,transparent 48%),radial-gradient(ellipse at 84% 8%,#b4caff 0%,transparent 48%),radial-gradient(ellipse at 96% 68%,#ffd7b0 0%,transparent 50%),radial-gradient(ellipse at 16% 92%,#e9bcea 0%,transparent 52%),#f6f3ef; }
+    .progress { position:absolute; left:180px; bottom:120px; width:1560px; height:6px; border-radius:8px; overflow:hidden; background:#ffffff80; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,#0750eb,#c026d3,#e9bcea); transform-origin:left; }
+    .eyebrow { position:absolute; left:180px; top:180px; color:#24428a; font-size:30px; font-weight:700; letter-spacing:5px; }
+#q-panel{top:290px;} .panel{border:3px solid #b4caff; border-left:12px solid #0750eb; box-shadow:0 30px 80px #344d8c30;} #q-reason {border:0; padding:24px; background:linear-gradient(110deg,#d9f5f7,#e2eaff,#f1d7ef); border-radius:16px;} #q-reason-inner{color:#17376d;}
+  .eyebrow, .progress { display:none; }
+  #q-panel{top:260px;} .panel{min-height:475px; padding:50px 56px;} h2{font-size:56px;line-height:1.16;} #q-reason-inner{font-size:36px;}
+  </style>
+  <div id="root" data-composition-id="question" data-width="1920" data-height="1080">
+    <div class="color-field" aria-hidden="true" data-layout-ignore><div id="question-colors" class="color-drift"></div></div>
+    <div class="progress" aria-hidden="true" data-layout-ignore><div id="question-progress" class="progress-fill"></div></div>
+    <div class="eyebrow">CONTEXT BEFORE A DECISION</div>
+    <div id="q-panel" class="clip" data-start="0.08" data-duration="5.4">
+      <div id="q-panel-inner" class="panel">
+        <div class="meta">
+          <span class="id">DEMO-003</span>
+          <span class="badge">Waiting for client</span>
+          <span class="await">Demo Fuel Station · Awaiting context</span>
+        </div>
+        <h2>Which vehicle does this fuel purchase concern, how is it used, and what was the business purpose?</h2>
+        <p id="q-reason" class="clip" data-start="2.26" data-duration="3.2">
+          <span id="q-reason-inner">No tax treatment is inferred from the supplier.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#q-panel-inner", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.28, ease: "power4.out" }, 0.08);
+      // beat-locked: 15.82s
+      tl.fromTo("#q-reason-inner", { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.24, ease: "power4.out" }, 2.26);
+      
+      tl.fromTo("#question-colors", {x:-45,y:-25,scale:1.02}, {x:45,y:25,scale:1.08,duration:5.54,ease:"sine.inOut"},0);
+      tl.fromTo("#question-progress", {scaleX:0}, {scaleX:1,duration:5.44,ease:"none"},0);
+      tl.fromTo("#q-panel-inner", {scale:0.96}, {scale:1,duration:0.55,ease:"back.out(1.2)"},0.08);
+      window.__timelines["question"] = tl;
+    })();
+  </script>
+</template>

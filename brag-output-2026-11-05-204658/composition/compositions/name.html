@@ -1,0 +1,65 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #eceeed;
+      color: #171819;
+      font-family: Inter, sans-serif;
+    }
+    #name-lockup, #name-sub { position: absolute; left: 180px; width: 1500px; }
+    #name-lockup { top: 360px; }
+    #name-sub { top: 560px; margin: 0; }
+    .lockup { display: flex; align-items: center; gap: 28px; }
+    .lockup img { width: 104px; height: 104px; display: block; }
+    .lockup h1 {
+      margin: 0;
+      font-size: 92px;
+      font-weight: 900;
+      letter-spacing: -3px;
+      line-height: 0.95;
+    }
+    #name-sub-inner {
+      display: block;
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.2;
+    }
+  
+    #root { background: #f6f3ef; overflow: hidden; }
+    .color-field { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .color-drift { position:absolute; inset:-140px;
+      background:radial-gradient(ellipse at 8% 12%,#9ee9f3 0%,transparent 48%),radial-gradient(ellipse at 84% 8%,#b4caff 0%,transparent 48%),radial-gradient(ellipse at 96% 68%,#ffd7b0 0%,transparent 50%),radial-gradient(ellipse at 16% 92%,#e9bcea 0%,transparent 52%),#f6f3ef; }
+    .progress { position:absolute; left:180px; bottom:120px; width:1560px; height:6px; border-radius:8px; overflow:hidden; background:#ffffff80; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,#0750eb,#c026d3,#e9bcea); transform-origin:left; }
+    .eyebrow { position:absolute; left:180px; top:180px; color:#24428a; font-size:30px; font-weight:700; letter-spacing:5px; }
+.lockup h1{color:#123f9b;} .lockup img {padding:16px; background:white; border-radius:28px; box-shadow:0 20px 55px #613da330;} #name-sub-inner {border-left:7px solid #c026d3; padding-left:24px;}
+  .eyebrow, .progress { display:none; }
+  </style>
+  <div id="root" data-composition-id="name" data-width="1920" data-height="1080">
+    <div class="color-field" aria-hidden="true" data-layout-ignore><div id="name-colors" class="color-drift"></div></div>
+    <div class="progress" aria-hidden="true" data-layout-ignore><div id="name-progress" class="progress-fill"></div></div>
+    <div class="eyebrow">MEET YOUR INVOICE AGENTS</div>
+    <div id="name-lockup" class="clip" data-start="0.06" data-duration="3.68">
+      <div id="name-lockup-inner" class="lockup">
+        <img src="assets/icon.svg" alt="Grok Invoices" />
+        <h1>Grok Invoices</h1>
+      </div>
+    </div>
+    <p id="name-sub" class="clip" data-start="1.09" data-duration="2.65">
+      <span id="name-sub-inner">Agents book purchase invoices from KSeF.</span>
+    </p>
+  </div>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#name-lockup-inner", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power4.out" }, 0.06);
+      tl.fromTo("#name-sub-inner", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.26, ease: "power4.out" }, 1.09);
+      
+      tl.fromTo("#name-colors", {x:-45,y:-25,scale:1.02}, {x:45,y:25,scale:1.08,duration:3.8,ease:"sine.inOut"},0);
+      tl.fromTo("#name-progress", {scaleX:0}, {scaleX:1,duration:3.6999999999999997,ease:"none"},0);
+      window.__timelines["name"] = tl;
+    })();
+  </script>
+</template>
