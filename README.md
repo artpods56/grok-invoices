@@ -1,4 +1,5 @@
 <p align="center">
+  <img src="apps/web/public/assets/logo-v2.png" width="96" height="96" alt="Grok Invoices pastel folded G logo"><br>
   <img src="assets/readme/hero.svg" alt="Grok Invoices — your agents’ accounting workspace" width="100%">
 </p>
 
@@ -162,7 +163,7 @@ Open http://localhost:4173. Stop the server with Ctrl+C. Run `npm test` for doma
 ---
 
 <p align="center">
-  <img src="assets/icon.svg" width="28" height="28" alt="Grok Invoices logo"><br>
+  <img src="apps/web/public/assets/logo-v2.png" width="40" height="40" alt="Grok Invoices logo"><br>
   <strong>Built at Grok Bot Hackathon · Wrocław · 2026</strong><br>
   <sub>Authentic AI session exports in <code>/sessions</code>. No fabricated history.</sub>
 </p>

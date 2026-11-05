@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
@@ -78,7 +79,13 @@ export function App() {
       setLoading(true);
       try {
         const result = await loadPlatformSnapshot({ signal: controller.signal });
-        result.postings = await loadPlatformPostings(result.invoices, { signal: controller.signal });
+        try {
+          result.postings = await loadPlatformPostings(result.invoices, { signal: controller.signal });
+        } catch (failure) {
+          if (!active) return;
+          result.postings = [];
+          result.postingsError = 'Accounting details could not be refreshed. Retry to load decisions, sources and precedents.';
+        }
         if (active) { setSnapshot(result); setUpdatedAt(Date.now()); setPlatformError(''); }
       } catch (failure) {
         if (active) setPlatformError(failure?.name === 'AbortError' ? 'Platform request timed out. Please retry.' : failure instanceof Error ? failure.message : 'Could not load the platform.');
@@ -143,8 +150,8 @@ export function App() {
     {mobileNav && <button className="nav-backdrop" aria-label="Close navigation" onClick={() => setMobileNav(false)} />}
     <aside className={`sidebar ${mobileNav ? 'is-open' : ''}`} aria-label="Main navigation">
       <button className="company-switcher" onClick={() => { navigate('Company context'); }}>
-        <img src="/assets/icon.svg" width="30" height="30" alt="Grok Invoices" />
-        <span><span className="company-caption">Demo company</span><strong>Grok Invoices</strong></span><CaretDown size={13} />
+        <Image src="/assets/logo-v2.png" width={36} height={36} alt="Grok Invoices" />
+        <span><span className="company-caption">{mask(snapshot?.client.name ?? 'Your workspace')}</span><strong>Grok Invoices</strong></span><CaretDown size={13} />
       </button>
       <nav>{navigation.map(({ label, icon: Icon, workspace }) => <div key={label}>
         {workspace && <div className="workspace-label">Workspace</div>}
@@ -162,7 +169,7 @@ export function App() {
           <label className="search"><MagnifyingGlass size={18} /><input ref={searchRef} aria-label="Search invoices" placeholder="Search..." disabled={privateMode} value={query} onChange={event => setQuery(event.target.value)} /><kbd>⌘ K</kbd></label>
           <button className={`icon-button ${privateMode ? 'is-toggled' : ''}`} aria-label={privateMode ? 'Show private details' : 'Hide private details'} title={privateMode ? 'Show private details' : 'Hide private details'} aria-pressed={privateMode} onClick={() => { setPrivateMode(!privateMode); setActiveId(null); setModal(null); setNotice(''); setError(''); setQuery(''); setSelected(new Set()); }}>{privateMode ? <Eye size={18} /> : <EyeSlash size={18} />}</button>
           <button className="icon-button" onClick={() => setModal('notifications')} aria-label="View notifications"><Bell size={18} /></button>
-          <button className="avatar-button" onClick={() => setModal('profile')} aria-label="Demo company profile"><User size={20} /></button>
+          <button className="avatar-button" onClick={() => setModal('profile')} aria-label="Company profile"><User size={20} /></button>
         </div>
       </header>
 

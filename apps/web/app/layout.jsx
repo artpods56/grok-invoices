@@ -3,7 +3,7 @@ import './globals.css';
 export const metadata = {
   title: 'Grok Invoices — Dashboard',
   description: 'Invoice decisions, client questions, and company context in one workspace.',
-  icons: { icon: '/assets/icon.svg' },
+  icons: { icon: '/assets/logo-v2.png', apple: '/assets/logo-v2.png' },
 };
 
 export default function RootLayout({ children }) {

@@ -77,16 +77,23 @@ function postingRow(row, path) {
   decimal(row.deductible_vat, path, 'deductible_vat');
   if (!Number.isInteger(row.vat_deduction_percent) || row.vat_deduction_percent < 0 || row.vat_deduction_percent > 100) invalid(path, 'vat_deduction_percent');
   if (row.legal_basis !== null && typeof row.legal_basis !== 'string') invalid(path, 'legal_basis');
+  if (typeof row.reusable !== 'boolean') invalid(path, 'reusable');
+  object(row.conditions, path);
 }
 
 async function get(path, signal) {
+  signal?.throwIfAborted();
   const response = await fetch(`/api${path}`, { method: 'GET', signal, headers: { Accept: 'application/json' } });
+  signal?.throwIfAborted();
   if (!response.ok) throw new Error(`Platform GET /api${path} failed (HTTP ${response.status}).`);
-  try { return await response.json(); }
+  let result;
+  try { result = await response.json(); }
   catch (error) {
     if (error?.name === 'AbortError') throw error;
     throw new Error(`Invalid JSON from /api${path}.`, { cause: error });
   }
+  signal?.throwIfAborted();
+  return result;
 }
 
 function normalize(row, cases, questions) {
@@ -123,12 +130,40 @@ export async function loadPlatformSnapshot({ signal } = {}) {
 
 // The API has no list of postings, so decisions and precedents come from each invoice's detail.
 export async function loadPlatformPostings(invoices, { signal } = {}) {
-  const details = await Promise.all(invoices.map(invoice => get(`/invoices/${invoice.apiId}`, signal)));
-  return details.flatMap((detail, index) => {
-    const path = `/invoices/${invoices[index].apiId}`;
-    object(detail, path);
-    return rows(detail.postings, path, postingRow);
-  });
+  signal?.throwIfAborted();
+  if (!Array.isArray(invoices)) invalid('/invoices', 'expected an array');
+  const seen = new Set();
+  for (const invoice of invoices) {
+    object(invoice, '/invoices');
+    id(invoice.apiId, '/invoices', 'apiId');
+    if (seen.has(invoice.apiId)) invalid('/invoices', 'duplicate apiId');
+    seen.add(invoice.apiId);
+  }
+
+  // Invoice details include the full KSeF document. Bound the fan-out for larger inboxes.
+  const details = new Array(invoices.length);
+  let next = 0;
+  let failed = false;
+  async function loadNext() {
+    try {
+      while (!failed && next < invoices.length) {
+        signal?.throwIfAborted();
+        const index = next++;
+        const apiId = invoices[index].apiId;
+        const path = `/invoices/${apiId}`;
+        const detail = object(await get(path, signal), path);
+        if (detail.id !== apiId) invalid(path, 'invoice id mismatch');
+        const postings = rows(detail.postings, path, postingRow);
+        if (postings.some(posting => posting.invoice_id !== apiId)) invalid(path, 'invoice relation mismatch');
+        details[index] = postings;
+      }
+    } catch (error) {
+      failed = true;
+      throw error;
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(6, invoices.length) }, loadNext));
+  return rows(details.flat(), '/invoices', postingRow);
 }
 
 // Returns a fresh normalized invoice plus real case questions, postings and matching events.

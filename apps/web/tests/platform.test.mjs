@@ -22,6 +22,11 @@ const event = (id = 1, invoice_id = 1, case_id = null) => ({
   type: 'invoice.received', summary: 'Mock invoice received', data: {},
 });
 const client = { name: 'Demo Company', nip: '9876543210', fleet: [], facts: [] };
+const posting = (invoice_id = 1) => ({
+  id: invoice_id + 100, invoice_id, account: '403', rationale: 'Mixed use', actor: 'accountant',
+  created_at: '2026-11-05T10:00:00Z', status: 'active', source: 'accountant',
+  deductible_vat: '40.25', vat_deduction_percent: 50, legal_basis: null, reusable: true, conditions: {},
+});
 const snapshot = () => ({
   '/api/invoices': [invoice()], '/api/cases': [], '/api/questions': [],
   '/api/client': client, '/api/events': [event()],
@@ -153,15 +158,88 @@ test('detail rejects invalid IDs before fetching, wrong relations and failed cas
   });
 });
 
-test('postings for decisions and precedents come from each invoice detail and are validated', async () => {
-  const posting = { id: 7, invoice_id: 2, account: '403', rationale: 'Mixed use', actor: 'accountant', created_at: '2026-11-05T10:00:00Z', status: 'active', source: 'accountant', deductible_vat: '40.25', vat_deduction_percent: 50, legal_basis: null, reusable: true };
-  const original = globalThis.fetch;
-  const calls = [];
-  globalThis.fetch = async url => { calls.push(url); return Response.json({ postings: [posting] }); };
-  try {
-    assert.deepEqual(await loadPlatformPostings([{ apiId: 2 }]), [posting]);
-    assert.deepEqual(calls, ['/api/invoices/2']);
-    globalThis.fetch = async () => Response.json({ postings: [{ ...posting, source: 'guess' }] });
-    await assert.rejects(loadPlatformPostings([{ apiId: 2 }]), /posting source/);
-  } finally { globalThis.fetch = original; }
+test('postings for decisions and precedents come from each invoice detail and are validated', async t => {
+  const calls = mockFetch(t, { '/api/invoices/2': { id: 2, postings: [posting(2)] } });
+  assert.deepEqual(await loadPlatformPostings([{ apiId: 2 }]), [posting(2)]);
+  assert.deepEqual(calls.map(call => call.url), ['/api/invoices/2']);
+});
+
+test('postings validate every input before fetching and keep an empty inbox empty', async t => {
+  const calls = mockFetch(t, {});
+  for (const input of [undefined, {}, [null], [{ apiId: '../reset' }], [{ apiId: 1 }, { apiId: '2' }], [{ apiId: 1 }, { apiId: 1 }]]) {
+    await assert.rejects(loadPlatformPostings(input), /Invalid platform response/);
+  }
+  assert.deepEqual(await loadPlatformPostings([]), []);
+  assert.equal(calls.length, 0);
+});
+
+test('postings reject missing invoices and invalid or unrelated decisions', async t => {
+  for (const [name, payload, expected] of [
+    ['missing invoice', () => ({ ok: false, status: 404 }), /HTTP 404/],
+    ['wrong invoice', { id: 3, postings: [] }, /invoice id mismatch/],
+    ['missing postings', { id: 2 }, /expected an array/],
+    ['wrong relation', { id: 2, postings: [posting(3)] }, /invoice relation mismatch/],
+    ['unknown source', { id: 2, postings: [{ ...posting(2), source: 'guess' }] }, /posting source/],
+    ['missing reusable flag', { id: 2, postings: [{ ...posting(2), reusable: undefined }] }, /reusable/],
+    ['invalid conditions', { id: 2, postings: [{ ...posting(2), conditions: [] }] }, /expected an object/],
+  ]) await t.test(name, async t => {
+    mockFetch(t, { '/api/invoices/2': payload });
+    await assert.rejects(loadPlatformPostings([{ apiId: 2 }]), expected);
+  });
+});
+
+test('postings bound concurrent detail requests and preserve order when responses finish out of order', async t => {
+  const waiting = [];
+  let active = 0;
+  let peak = 0;
+  t.mock.method(globalThis, 'fetch', async url => {
+    active++;
+    peak = Math.max(peak, active);
+    const apiId = Number(url.split('/').at(-1));
+    await new Promise(resolve => waiting.push(() => { active--; resolve(); }));
+    return Response.json({ id: apiId, postings: [posting(apiId)] });
+  });
+  const invoices = Array.from({ length: 20 }, (_, index) => ({ apiId: index + 1 }));
+  const pending = loadPlatformPostings(invoices);
+  assert.equal(waiting.length, 6);
+  while (waiting.length) {
+    waiting.splice(0).reverse().forEach(resolve => resolve());
+    await new Promise(resolve => setImmediate(resolve));
+  }
+  assert.equal(peak, 6);
+  assert.deepEqual((await pending).map(row => row.invoice_id), invoices.map(row => row.apiId));
+});
+
+test('cancelled postings do not start requests and stop scheduling queued invoices', async t => {
+  const controller = new AbortController();
+  const waiting = [];
+  const calls = mockFetch(t, Object.fromEntries(Array.from({ length: 20 }, (_, index) => [
+    `/api/invoices/${index + 1}`, () => new Promise(resolve => waiting.push(() => resolve(Response.json({ id: index + 1, postings: [] })))),
+  ])));
+  const pending = loadPlatformPostings(Array.from({ length: 20 }, (_, index) => ({ apiId: index + 1 })), { signal: controller.signal });
+  const rejected = assert.rejects(pending, { name: 'AbortError' });
+  assert.equal(calls.length, 6);
+  assert.ok(calls.every(call => call.options.signal === controller.signal));
+  controller.abort();
+  waiting.forEach(resolve => resolve());
+  await rejected;
+  assert.equal(calls.length, 6);
+  await assert.rejects(loadPlatformPostings([{ apiId: 1 }], { signal: controller.signal }), { name: 'AbortError' });
+  assert.equal(calls.length, 6);
+});
+
+test('failed postings stop scheduling queued invoices', async t => {
+  const waiting = [];
+  const calls = mockFetch(t, Object.fromEntries(Array.from({ length: 20 }, (_, index) => [
+    `/api/invoices/${index + 1}`, () => new Promise(resolve => waiting.push(() => resolve(index === 0
+      ? { ok: false, status: 404 }
+      : Response.json({ id: index + 1, postings: [] })))),
+  ])));
+  const pending = loadPlatformPostings(Array.from({ length: 20 }, (_, index) => ({ apiId: index + 1 })));
+  const rejected = assert.rejects(pending, /HTTP 404/);
+  waiting.shift()();
+  await rejected;
+  waiting.forEach(resolve => resolve());
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(calls.length, 6);
 });
