@@ -30,5 +30,20 @@ services:
       retries: 6
       start_period: 5s
 
+  web:
+    image: grok-invoices-web:${RELEASE:?RELEASE is required}
+    restart: unless-stopped
+    init: true
+    environment:
+      API_BASE_URL: http://app:8000
+    ports:
+      - "127.0.0.1:8011:3000"
+    depends_on:
+      app:
+        condition: service_healthy
+    mem_limit: 256m
+    security_opt:
+      - no-new-privileges:true
+
 volumes:
   data:
