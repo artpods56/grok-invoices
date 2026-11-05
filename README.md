@@ -30,9 +30,9 @@ A fuel invoice arrives. The vehicle is unfamiliar. Instead of guessing, the agen
 ## A calm view of every case
 
 <p align="center">
-  <img src="assets/design/dashboard-f-mockup.png" alt="Dashboard design with pastel summary cards, invoice table and narrow sidebar" width="100%">
+  <img src="assets/design/dashboard-f-mockup-logo-v2.png" alt="Dashboard design with the pastel Grok Invoices logo, summary cards and invoice table" width="100%">
   <br>
-  <sub>Selected design mockup · synthetic example data · not a screenshot of production activity.</sub>
+  <sub>Selected design mockup with updated branding · synthetic example data · not a screenshot of production activity.</sub>
 </p>
 
 Search, filter, export CSV, or inspect the recorded posting, source and case history behind an invoice. The **Next.js + Tailwind dashboard** is a read-only view of the shared platform. A status card is a view of a record, not proof that a bot or external integration completed successfully.
