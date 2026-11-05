@@ -4,6 +4,9 @@ Grok Invoices is a hackathon demo of AI agents processing purchase invoices from
 repo holds the shared platform they work through: a FastAPI app with SQLite storage, managed
 with uv on Python 3.13. The invoice model comes from ksef2, our own KSeF SDK.
 
+All agents run as Grok Bots, each connecting through its own dedicated MCP server. The platform
+holds state and enforces rules, and it never calls a model itself.
+
 The Outline docs "Grok Invoices: koncepcja projektu" and "Demo: telefon po fakturze
 paliwowej" describe the product and the stage demo.
 
