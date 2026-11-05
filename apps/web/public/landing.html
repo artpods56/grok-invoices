@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grok Invoices - Agents as a Service</title>
+  <link rel="icon" href="/assets/icon.svg">
+  <style>
+    :root {
+      font-family: 'Inter', sans-serif;
+      color: #171819;
+      background:
+        radial-gradient(ellipse at 8% 12%, #9ee9f3 0%, transparent 48%),
+        radial-gradient(ellipse at 84% 8%, #b4caff 0%, transparent 48%),
+        radial-gradient(ellipse at 96% 68%, #ffd7b0 0%, transparent 50%),
+        radial-gradient(ellipse at 16% 92%, #e9bcea 0%, transparent 52%),
+        #f6f3ef;
+      background-attachment: fixed;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+    main {
+      width: min(960px, 100%);
+      min-height: min(480px, calc(100dvh - 32px));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 48px 24px;
+      border: 8px solid #fff;
+      border-radius: 36px;
+      background: #fafafa;
+      box-shadow: 0 25px 65px #27323a12;
+      text-align: center;
+    }
+    img { width: 56px; height: 56px; }
+    h1 {
+      margin: 0;
+      max-width: 18ch;
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 600;
+      letter-spacing: -.04em;
+      line-height: 1.1;
+      text-wrap: balance;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/assets/icon.svg" alt="" width="56" height="56">
+    <h1>Grok Invoices - Agents as a Service</h1>
+  </main>
+</body>
+</html>
