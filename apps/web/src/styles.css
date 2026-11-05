@@ -224,3 +224,20 @@ h3 { font-size: 13px; font-weight: 500; line-height: 1.5; }
   .dialog-heading h2 { font-size: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
+
+/* Read-only platform dataset controls retain the selected dashboard artwork. */
+.dataset-selector { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #667067; }
+.dataset-selector select { max-width: 170px; padding: 8px 28px 8px 10px; border: 1px solid #dde3dd; border-radius: 8px; background: #fff; color: #263b2b; font: inherit; }
+.platform-sync { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; padding: 14px 18px; border: 1px solid #dfe6df; border-radius: 12px; background: #f8fbf8; font-size: 12px; }
+.platform-sync p { margin: 5px 0 0; color: #637064; line-height: 1.5; }
+.platform-sync .platform-sync-error { flex-basis: 100%; color: #943e28; }
+.status-badge.received { background: #eef1f7; color: #4a5875; }
+.status-badge.in_review { background: #f0eafa; color: #70548d; }
+.support-panel .detail-row > div { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 680px) {
+  .page-heading { flex-wrap: wrap; }
+  .heading-actions { flex-wrap: wrap; justify-content: space-between; width: 100%; }
+  .dataset-selector { flex-direction: column; align-items: flex-start; gap: 4px; font-size: 10px; }
+  .dataset-selector select { max-width: 145px; padding: 7px; }
+  .platform-sync { padding: 12px; }
+}

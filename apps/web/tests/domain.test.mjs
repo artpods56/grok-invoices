@@ -23,7 +23,7 @@ test('fixtures match the selected mock and each call owns all nested data', () =
     ['DEMO-003', 'Demo Fuel Station', 246, 'Unknown vehicle'],
     ['DEMO-004', 'Demo Supplier', 123, 'Missing context'],
   ]);
-  assert.deepEqual(summarizeInvoices(first), { completed: 2, waiting_for_client: 1, blocked: 1 });
+  assert.deepEqual(summarizeInvoices(first), { completed: 2, waiting_for_client: 1, blocked: 1, received: 0, in_review: 0, attention: 0 });
   assert.ok(first.every(row => row.date === '2026-11-05' && row.amount === row.netAmount + row.vatAmount));
   first[0].sources[0].note = 'changed';
   first[1].timeline[0].title = 'changed';
@@ -45,9 +45,9 @@ test('filter and counts are pure, compose status with case-insensitive search, a
   assert.notEqual(filterInvoices(invoices), invoices);
   assert.deepEqual(filterInvoices(invoices, { status: 'unsupported' }), []);
   assert.deepEqual(filterInvoices(invoices, { query: 'missing supplier' }), []);
-  assert.deepEqual(summarizeInvoices([]), { completed: 0, waiting_for_client: 0, blocked: 0 });
-  assert.deepEqual(summarizeInvoices(invoices), { completed: 2, waiting_for_client: 1, blocked: 1 });
-  assert.deepEqual(Object.keys(STATUS_LABELS), ['completed', 'waiting_for_client', 'blocked']);
+  assert.deepEqual(summarizeInvoices([]), { completed: 0, waiting_for_client: 0, blocked: 0, received: 0, in_review: 0, attention: 0 });
+  assert.deepEqual(summarizeInvoices(invoices), { completed: 2, waiting_for_client: 1, blocked: 1, received: 0, in_review: 0, attention: 0 });
+  assert.deepEqual(Object.keys(STATUS_LABELS), ['completed', 'waiting_for_client', 'blocked', 'received', 'in_review', 'attention']);
 });
 
 test('validation rejects incomplete, wrong-type, oversized and unsupported usage answers', () => {
@@ -85,7 +85,7 @@ test('resolution changes only the requested case without mutating input or retai
   assert.equal(result[2].precedentId, null);
   assert.equal(result[2].timeline.length, 4);
   assert.match(result[2].reasoning, /Synthetic decision/);
-  assert.deepEqual(summarizeInvoices(result), { completed: 3, waiting_for_client: 0, blocked: 1 });
+  assert.deepEqual(summarizeInvoices(result), { completed: 3, waiting_for_client: 0, blocked: 1, received: 0, in_review: 0, attention: 0 });
   assert.deepEqual(resolveDemoQuestion(invoices, 'DEMO-003', reply), result, 'same input produces deterministic output');
 });
 
@@ -146,4 +146,43 @@ test('CSV neutralizes spreadsheet formula injection across invoice and client-an
     const row = parseCsv(exportInvoicesCsv(invoices))[1];
     for (const column of [0, 1, 7, 8, 9, 10, 11, 12]) assert.equal(row[column], `'${payload}`);
   }
+});
+
+
+test('platform attention counts and filters include only received and in-review invoices', () => {
+  const invoices = freezeDeep(['received', 'in_review', 'waiting_for_client', 'completed', 'blocked'].map((status, index) => ({
+    id: `API-${index + 1}`, status, origin: 'platform', supplier: index === 0 ? 'First seller' : 'Other seller',
+  })));
+  assert.deepEqual(summarizeInvoices(invoices), { completed: 1, waiting_for_client: 1, blocked: 1, received: 1, in_review: 1, attention: 2 });
+  assert.deepEqual(filterInvoices(invoices, { status: 'attention' }).map(row => row.id), ['API-1', 'API-2']);
+  assert.deepEqual(filterInvoices(invoices, { status: 'attention', query: 'first' }).map(row => row.id), ['API-1']);
+  assert.deepEqual(filterInvoices(invoices, { status: 'blocked' }).map(row => row.id), ['API-5']);
+  assert.equal(filterInvoices(invoices, { query: 'In review' })[0].id, 'API-2');
+  assert.equal(STATUS_LABELS.received, 'Received');
+  assert.equal(STATUS_LABELS.in_review, 'In review');
+});
+
+test('API invoice CSV needs no synthetic answer, source, reasoning or timeline fields', () => {
+  const invoice = freezeDeep({
+    id: 'API-23', origin: 'platform', supplier: 'Platform seller, "A"', date: '2026-11-05',
+    amount: 246, netAmount: 200, vatAmount: 46, status: 'in_review', context: 'Recorded purchase',
+    raw: { status: 'escalated', vehicle_plate: '=UNTRUSTED' },
+    cases: [], questions: [],
+  });
+  const rows = parseCsv(exportInvoicesCsv([invoice, createDemoInvoices()[0]]));
+  assert.equal(rows[1][0], 'API-23');
+  assert.equal(rows[1][1], invoice.supplier);
+  assert.equal(rows[1][3], '246.00');
+  assert.equal(rows[1][6], 'In review');
+  assert.equal(rows[1][8], "'=UNTRUSTED");
+  assert.equal(rows[1][11], '');
+  assert.equal(rows[1][12], '');
+  assert.equal(rows[1][13], 'Platform API (demo records)');
+  assert.equal(rows[2][13], 'Synthetic demo only');
+});
+
+test('synthetic resolution cannot modify a waiting platform invoice', () => {
+  const invoices = freezeDeep([{ ...createDemoInvoices()[2], id: 'API-3', origin: 'platform' }]);
+  assert.throws(() => resolveDemoQuestion(invoices, 'API-3', reply), /read only/);
+  assert.equal(invoices[0].status, 'waiting_for_client');
 });

@@ -2,6 +2,9 @@ export const STATUS_LABELS = Object.freeze({
   completed: 'Completed',
   waiting_for_client: 'Waiting for client',
   blocked: 'Blocked',
+  received: 'Received',
+  in_review: 'In review',
+  attention: 'Needs attention',
 });
 
 const reference = {
@@ -72,14 +75,15 @@ export function createDemoInvoices() {
 export function summarizeInvoices(invoices) {
   return invoices.reduce((counts, invoice) => {
     if (Object.hasOwn(counts, invoice.status)) counts[invoice.status] += 1;
+    if (['received', 'in_review'].includes(invoice.status)) counts.attention += 1;
     return counts;
-  }, { completed: 0, waiting_for_client: 0, blocked: 0 });
+  }, { completed: 0, waiting_for_client: 0, blocked: 0, received: 0, in_review: 0, attention: 0 });
 }
 
 export function filterInvoices(invoices, { query = '', status = 'all' } = {}) {
   const search = String(query ?? '').trim().toLowerCase();
   return invoices.filter(invoice =>
-    (!status || status === 'all' || invoice.status === status) &&
+    (!status || status === 'all' || invoice.status === status || (status === 'attention' && ['received', 'in_review'].includes(invoice.status))) &&
     [invoice.id, invoice.supplier, invoice.context, invoice.date, STATUS_LABELS[invoice.status]]
       .some(value => String(value ?? '').toLowerCase().includes(search)),
   );
@@ -106,6 +110,7 @@ export function validateDemoAnswer(answer) {
 export function resolveDemoQuestion(invoices, invoiceId, answer) {
   const invoice = invoices.find(item => item.id === invoiceId);
   if (!invoice) throw new Error('Invoice not found.');
+  if (invoice.origin === 'platform') throw new Error('Platform invoices are read only.');
   if (invoice.status !== 'waiting_for_client') {
     throw new Error('Only cases waiting for the client can be resolved.');
   }
@@ -142,8 +147,9 @@ export function exportInvoicesCsv(invoices) {
     ...invoices.map(invoice => [
       invoice.id, invoice.supplier, invoice.date, invoice.amount.toFixed(2),
       invoice.netAmount.toFixed(2), invoice.vatAmount.toFixed(2), STATUS_LABELS[invoice.status],
-      invoice.context, invoice.answer?.vehicleRegistration, invoice.answer?.usage,
-      invoice.answer?.purpose, invoice.reasoning, invoice.precedentId, 'Synthetic demo only',
+      invoice.context, invoice.answer?.vehicleRegistration ?? invoice.raw?.vehicle_plate, invoice.answer?.usage,
+      invoice.answer?.purpose, invoice.reasoning, invoice.precedentId,
+      invoice.origin === 'platform' ? 'Platform API (demo records)' : 'Synthetic demo only',
     ]),
   ];
   return rows.map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
