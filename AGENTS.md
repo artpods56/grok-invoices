@@ -49,7 +49,7 @@ Code lives in `apps/api/src/grok_invoices`. Dependencies only point inward, and
 - `entrypoints/mcp_common.py`: what those servers share: the invite check, the transport, reporting errors.
 - `service_layer/secrets.py`: encrypts the stored KSeF token.
 - `ksef.py`: KSeF TEST calls through ksef2.
-- `seed.py`: demo data and fixture invoices.
+- `seed.py`: the KSeF TEST client, plus sample invoices behind `SAMPLE_DATA`.
 - `settings.py`: configuration from the environment.
 - `apps/api/tests/`: tests, including the full demo scenario in `test_platform.py`.
 - `deploy/`: server scripts and compose file. See the warning below.
@@ -105,6 +105,7 @@ rolls back to the previous one.
 - VAT on a fuel invoice is always 23%. The 50% is a deduction decided in the posting, never a KSeF field.
 - `POST /api/demo/issue-fuel-invoice` issues the stage invoice on KSeF TEST, and
   `POST /api/ksef/sync?source=test` fetches it.
-- `POST /api/ksef/sync` loads three fixture invoices, as a fallback if KSeF TEST is down.
+- Production holds no sample data: the seed is the KSeF TEST client Cisowa Logistyka (NIP `6421983078`), with no invoices or precedents.
+- `POST /api/ksef/sync?source=fixtures` loads three sample invoices only where `SAMPLE_DATA=true`, which is for tests and local smoke runs.
 - `POST /api/demo/reset` restores the seed. It wipes the state of anyone using production, so
   check first that no demo is running.

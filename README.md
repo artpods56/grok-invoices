@@ -59,7 +59,7 @@ on the server; locally, leave it unset to skip the check.
 
 - `POST /api/demo/issue-fuel-invoice` issues the stage demo's invoice on KSeF TEST.
 - `POST /api/ksef/sync?source=test` fetches new invoices from KSeF TEST.
-- `POST /api/ksef/sync` loads three fixture invoices, as a fallback if KSeF TEST is down.
+- `POST /api/ksef/sync?source=fixtures` loads three sample invoices only where `SAMPLE_DATA=true`. Production has no sample data.
 - `POST /api/demo/reset` restores the seed so the demo can run again.
 
 Bumping `STORE_VERSION` in `unit_of_work.py` rebuilds the database from the seed on the next
