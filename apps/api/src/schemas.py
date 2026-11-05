@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Any, Literal, Self
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Actor = Literal["invoice_agent", "regulations_agent", "client_agent", "accountant", "client", "ksef", "system"]
 PostingSource = Literal["rule", "precedent", "regulation", "accountant"]
@@ -190,3 +190,29 @@ class Event(BaseModel):
     invoice_id: int | None
     case_id: int | None
     data: dict[str, Any]
+
+
+AgentMode = Literal["demo", "xai"]
+
+
+class AgentRunIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    mode: AgentMode = "demo"
+    invoice_id: int | None = Field(default=None, gt=0)
+    limit: int = Field(default=20, ge=1, le=50)
+
+
+class AgentProposal(BaseModel):
+    """A model can propose a category or stop. It cannot choose amounts or accounts."""
+    model_config = ConfigDict(extra="forbid")
+    category: Literal["it_services", "vehicle_fuel", "unsupported"]
+    action: Literal["analyse", "block"]
+    rationale: str = Field(min_length=1, max_length=2000)
+
+
+class ContextAnswerIn(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    vehicle_plate: str | None = Field(default=None, max_length=20)
+    usage: VehicleUsage | None = None
+    business_purpose: str | None = Field(default=None, max_length=1000)
+    vehicle_model: str | None = Field(default=None, max_length=100)

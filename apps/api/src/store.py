@@ -1,15 +1,20 @@
 """Platform state and the rules agents can't bypass. Every write adds a timeline event."""
 
 import json
+import hashlib
 import re
 import sqlite3
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from fastapi import HTTPException
 
-from apps.api.src.schemas import AnswerIn, CorrectionIn, EscalationIn, FactIn, InvoiceIn, PostingIn, QuestionIn, VehicleIn
+from apps.api.src.agent_policy import DEMO_POLICY
+from apps.api.src.schemas import (
+    AgentProposal, AnswerIn, ContextAnswerIn, CorrectionIn, EscalationIn, FactIn,
+    InvoiceDetail, InvoiceIn, PostingIn, QuestionIn, VehicleIn,
+)
 
 
 def _now() -> str:
@@ -145,18 +150,40 @@ def _similarity(a: sqlite3.Row, b: sqlite3.Row) -> float:
 
 def precedent_blockers(conn: sqlite3.Connection, invoice: sqlite3.Row, conditions: dict[str, Any]) -> list[str]:
     """Why a precedent can't be reused here, however similar the invoice looks."""
+    supported = {"vehicle_usage", "vehicle_plate", "category", "policy_version", "chart_version", "valid_from", "valid_until"}
+    blockers = []
+    if any(not isinstance(value, str) for value in conditions.values()):
+        return ["precedent conditions must contain supported string values"]
+    if set(conditions) - supported:
+        blockers.append("the precedent has unsupported conditions")
+    if "vehicle_plate" in conditions and normalize_plate(conditions["vehicle_plate"]) != invoice["vehicle_plate"]:
+        blockers.append(f"vehicle {invoice['vehicle_plate']} does not match the precedent's vehicle scope")
+    if "category" in conditions and conditions["category"] != invoice_category(invoice["description"]):
+        blockers.append("the expense category does not match")
+    policy = agent_policy(conn)
+    for key, policy_key in (("policy_version", "version"), ("chart_version", "chart_version")):
+        if key in conditions and conditions[key] != (policy or {}).get(policy_key):
+            blockers.append(f"the {key} has changed")
+    try:
+        issued = date.fromisoformat(invoice["issue_date"])
+        if "valid_from" in conditions and issued < date.fromisoformat(conditions["valid_from"]):
+            blockers.append("the invoice predates the precedent's application period")
+        if "valid_until" in conditions and issued > date.fromisoformat(conditions["valid_until"]):
+            blockers.append("the invoice is outside the precedent's application period")
+    except (ValueError, TypeError):
+        blockers.append("the application date cannot be verified")
     required_usage = conditions.get("vehicle_usage")
     if not required_usage:
-        return []
+        return blockers
     plate = invoice["vehicle_plate"]
     if not plate:
-        return ["the invoice does not name a vehicle"]
+        return blockers + ["the invoice does not name a vehicle"]
     vehicle = conn.execute("SELECT usage FROM vehicles WHERE plate = ?", (plate,)).fetchone()
     if vehicle is None:
-        return [f"vehicle {plate} is not on the client's fleet"]
+        return blockers + [f"vehicle {plate} is not on the client's fleet"]
     if vehicle["usage"] != required_usage:
-        return [f"vehicle {plate} has usage '{vehicle['usage']}', the precedent requires '{required_usage}'"]
-    return []
+        return blockers + [f"vehicle {plate} has usage '{vehicle['usage']}', the precedent requires '{required_usage}'"]
+    return blockers
 
 
 def search_precedents(conn: sqlite3.Connection, invoice_id: int) -> list[dict[str, Any]]:
@@ -195,7 +222,7 @@ def insert_invoice(conn: sqlite3.Connection, body: InvoiceIn) -> dict[str, Any]:
     invoice_id = cursor.lastrowid
     log_event(
         conn, "ksef", "invoice_received",
-        f"Nowa faktura {body.ksef_number}: {body.seller_name}, {body.gross} PLN", invoice_id,
+        f"Invoice received {body.ksef_number}: {body.seller_name}, {body.gross} PLN", invoice_id,
     )
     return dict(_invoice_row(conn, invoice_id))
 
@@ -251,6 +278,8 @@ def create_posting(conn: sqlite3.Connection, invoice_id: int, body: PostingIn) -
         precedent = _posting_row(conn, body.precedent_id)
         if not precedent["reusable"] or precedent["status"] != "active":
             raise HTTPException(409, f"Posting {body.precedent_id} is not an active precedent")
+        if body.account != precedent["account"] or body.vat_deduction_percent != precedent["vat_deduction_percent"]:
+            raise HTTPException(409, "A reused precedent must retain its account and VAT treatment")
         blockers = precedent_blockers(conn, invoice, json.loads(precedent["conditions"]))
         if blockers:
             raise HTTPException(409, f"Precedent does not apply: {'; '.join(blockers)}")
@@ -262,14 +291,14 @@ def create_posting(conn: sqlite3.Connection, invoice_id: int, body: PostingIn) -
         conn.execute("UPDATE cases SET status = 'resolved', resolved_at = ? WHERE id = ?", (_now(), case_id))
 
     how = {
-        "rule": "dekretacja bezpośrednia",
-        "precedent": f"zastosowano precedens #{body.precedent_id}",
-        "regulation": "decyzja na podstawie przepisów",
-        "accountant": "decyzja księgowej",
+        "rule": "direct rule posting",
+        "precedent": f"precedent #{body.precedent_id} applied",
+        "regulation": "regulatory decision",
+        "accountant": "accountant decision",
     }[body.source]
     log_event(
         conn, body.actor, "invoice_posted",
-        f"Faktura {invoice['ksef_number']} → konto {body.account}, VAT {body.vat_deduction_percent}% ({how})",
+        f"Invoice {invoice['ksef_number']} -> account {body.account}, VAT deduction {body.vat_deduction_percent}% ({how})",
         invoice_id, case_id,
         {
             "posting_id": posting_id, "source": body.source, "confidence": body.confidence,
@@ -278,7 +307,7 @@ def create_posting(conn: sqlite3.Connection, invoice_id: int, body: PostingIn) -
     )
     if body.reusable:
         log_event(
-            conn, body.actor, "precedent_created", f"Nowy precedens #{posting_id}: {body.rationale}",
+            conn, body.actor, "precedent_created", f"Precedent created #{posting_id}: {body.rationale}",
             invoice_id, case_id, {"posting_id": posting_id, "conditions": body.conditions},
         )
     return _posting_dict(_posting_row(conn, posting_id))
@@ -294,7 +323,7 @@ def correct_posting(conn: sqlite3.Connection, posting_id: int, body: CorrectionI
     cited_by = [r["id"] for r in conn.execute("SELECT id FROM postings WHERE precedent_id = ? AND status = 'active'", (posting_id,))]
     log_event(
         conn, "accountant", "posting_corrected",
-        f"Księgowa poprawiła dekretację #{posting_id} → konto {body.account}, VAT {body.vat_deduction_percent}%",
+        f"Accountant corrected posting #{posting_id} -> account {body.account}, VAT deduction {body.vat_deduction_percent}%",
         old["invoice_id"], old["case_id"],
         {"old_posting_id": posting_id, "posting_id": new_id, "rationale": body.rationale, "postings_citing_old": cited_by},
     )
@@ -310,7 +339,7 @@ def escalate_invoice(conn: sqlite3.Connection, invoice_id: int, body: Escalation
         (invoice_id, body.reason, body.actor, _now()),
     ).lastrowid
     conn.execute("UPDATE invoices SET status = 'escalated' WHERE id = ?", (invoice_id,))
-    log_event(conn, body.actor, "case_opened", f"Eskalacja faktury {invoice['ksef_number']}: {body.reason}", invoice_id, case_id)
+    log_event(conn, body.actor, "case_opened", f"Invoice escalated {invoice['ksef_number']}: {body.reason}", invoice_id, case_id)
     return get_case(conn, case_id)
 
 
@@ -328,7 +357,7 @@ def ask_question(conn: sqlite3.Connection, case_id: int, body: QuestionIn) -> di
         (case_id, body.text, body.actor, _now()),
     ).lastrowid
     conn.execute("UPDATE cases SET status = 'waiting_for_client' WHERE id = ?", (case_id,))
-    log_event(conn, body.actor, "question_asked", f"Pytanie do klienta: {body.text}", case["invoice_id"], case_id, {"question_id": question_id})
+    log_event(conn, body.actor, "question_asked", f"Client question: {body.text}", case["invoice_id"], case_id, {"question_id": question_id})
     return dict(conn.execute("SELECT * FROM questions WHERE id = ?", (question_id,)).fetchone())
 
 
@@ -348,14 +377,14 @@ def answer_question(conn: sqlite3.Connection, question_id: int, body: AnswerIn) 
     ).fetchone()
     if still_open is None:
         conn.execute("UPDATE cases SET status = 'open' WHERE id = ?", (case["id"],))
-    log_event(conn, body.actor, "question_answered", f"Odpowiedź klienta: {body.answer}", case["invoice_id"], case["id"], {"question_id": question_id})
+    log_event(conn, body.actor, "question_answered", f"Client answer: {body.answer}", case["invoice_id"], case["id"], {"question_id": question_id})
     return dict(conn.execute("SELECT * FROM questions WHERE id = ?", (question_id,)).fetchone())
 
 
 def take_over_case(conn: sqlite3.Connection, case_id: int) -> dict[str, Any]:
     case = _open_case_row(conn, case_id)
     conn.execute("UPDATE cases SET assignee = 'accountant' WHERE id = ?", (case_id,))
-    log_event(conn, "accountant", "case_taken_over", f"Księgowa przejęła sprawę #{case_id}", case["invoice_id"], case_id)
+    log_event(conn, "accountant", "case_taken_over", f"Accountant took over case #{case_id}", case["invoice_id"], case_id)
     return get_case(conn, case_id)
 
 
@@ -364,7 +393,7 @@ def add_fact(conn: sqlite3.Connection, body: FactIn) -> dict[str, Any]:
         "INSERT INTO client_facts (key, value, source, created_at) VALUES (?, ?, ?, ?)",
         (body.key, body.value, body.source, _now()),
     ).lastrowid
-    log_event(conn, body.source, "client_fact_added", f"Nowy fakt o firmie: {body.key} = {body.value}", data={"fact_id": fact_id})
+    log_event(conn, body.source, "client_fact_added", f"Company fact: {body.key} = {body.value}", data={"fact_id": fact_id})
     return get_client(conn)
 
 
@@ -375,5 +404,231 @@ def add_vehicle(conn: sqlite3.Connection, body: VehicleIn) -> dict[str, Any]:
         " ON CONFLICT (plate) DO UPDATE SET model = excluded.model, usage = excluded.usage",
         (plate, body.model, body.usage),
     )
-    log_event(conn, body.actor, "vehicle_saved", f"Flota: {plate} ({body.model}, użytek: {body.usage})", data={"plate": plate})
+    log_event(conn, body.actor, "vehicle_saved", f"Fleet: {plate} ({body.model}, usage: {body.usage})", data={"plate": plate})
     return get_client(conn)
+
+
+# --- Agent workflow: the same database and transaction as the platform API ---
+
+def invoice_category(description: str) -> str:
+    if re.search(r"\b(fuel|diesel|petrol|paliwo|tankowanie)\b", description, re.I):
+        return "vehicle_fuel"
+    if re.search(r"\b(it|software|hosting)\b", description, re.I):
+        return "it_services"
+    return "unsupported"
+
+
+def agent_policy(conn: sqlite3.Connection) -> dict | None:
+    row = conn.execute("SELECT value FROM client_facts WHERE key = 'agent_policy' ORDER BY id DESC LIMIT 1").fetchone()
+    try:
+        value = json.loads(row[0]) if row else None
+        return value if isinstance(value, dict) else None
+    except (ValueError, TypeError):
+        return None
+
+
+def setup_demo_policy(conn: sqlite3.Connection) -> dict:
+    if get_client(conn)["nip"] != "8943210098":
+        raise HTTPException(409, "The synthetic policy is restricted to the seeded demo company")
+    if agent_policy(conn) != DEMO_POLICY:
+        add_fact(conn, FactIn(key="agent_policy", value=json.dumps(DEMO_POLICY), source="system"))
+    return DEMO_POLICY
+
+
+def agent_context(conn: sqlite3.Connection, invoice_id: int) -> dict:
+    invoice = get_invoice(conn, invoice_id)
+    return {
+        "invoice": invoice, "client": get_client(conn), "accounts": list_accounts(conn),
+        "policy": agent_policy(conn), "precedents": search_precedents(conn, invoice_id),
+        "questions": [dict(q) for q in conn.execute(
+            "SELECT q.* FROM questions q JOIN cases c ON c.id = q.case_id WHERE c.invoice_id = ? ORDER BY q.id",
+            (invoice_id,),
+        )],
+    }
+
+
+def context_fingerprint(context: dict) -> str:
+    return hashlib.sha256(json.dumps(context, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def log_agent_analysis(conn: sqlite3.Connection, invoice_id: int, mode: str, triage: AgentProposal, final: AgentProposal) -> None:
+    log_event(conn, "invoice_agent", "agent_analysis", "Invoice agent proposal validated by the platform", invoice_id,
+              data={"mode": mode, "category": triage.category, "action": triage.action, "rationale": triage.rationale})
+    if final is not triage:
+        log_event(conn, "regulations_agent", "agent_analysis", "Regulatory agent proposal validated by the platform", invoice_id,
+                  data={"mode": mode, "category": final.category, "action": final.action, "rationale": final.rationale})
+
+
+def agent_result(conn: sqlite3.Connection, invoice_id: int) -> dict:
+    invoice = get_invoice(conn, invoice_id)
+    event = conn.execute(
+        "SELECT data FROM events WHERE invoice_id = ? AND type = 'agent_state' ORDER BY id DESC LIMIT 1", (invoice_id,),
+    ).fetchone()
+    state = json.loads(event[0]) if event else {"status": "pending", "reason": "Not processed by the agent runner"}
+    if invoice["status"] == "posted":
+        state = {**state, "status": "completed", "reason": "Posting recorded in the platform"}
+    elif any(c["status"] == "waiting_for_client" for c in invoice["cases"]):
+        state = {**state, "status": "waiting_for_client"}
+    questions = []
+    for case in invoice["cases"]:
+        for question in get_case(conn, case["id"])["questions"]:
+            decision = next((p for p in invoice["postings"] if p["case_id"] == case["id"] and p["status"] == "active"), None)
+            questions.append({**question, "status": "resolved" if decision else question["status"],
+                              "resolved_by_decision_id": decision["id"] if decision else None})
+    return {"invoice_id": invoice_id, **state, "invoice": InvoiceDetail.model_validate(invoice).model_dump(mode="json"),
+            "questions": questions, "simulation": True}
+
+
+def _agent_state(conn: sqlite3.Connection, invoice_id: int, status: str, reason: str, mode: str) -> dict:
+    state = {"status": status, "reason": reason, "mode": mode}
+    last = conn.execute(
+        "SELECT data FROM events WHERE invoice_id = ? AND type = 'agent_state' ORDER BY id DESC LIMIT 1", (invoice_id,),
+    ).fetchone()
+    if not last or json.loads(last[0]) != state:
+        log_event(conn, "system", "agent_state", reason, invoice_id, data=state)
+    return agent_result(conn, invoice_id)
+
+
+def _agent_case(conn: sqlite3.Connection, invoice_id: int, reason: str) -> dict:
+    case = conn.execute("SELECT id FROM cases WHERE invoice_id = ? AND status != 'resolved' ORDER BY id DESC LIMIT 1", (invoice_id,)).fetchone()
+    if case:
+        return get_case(conn, case[0])
+    return escalate_invoice(conn, invoice_id, EscalationIn(reason=reason))
+
+
+def block_agent(conn: sqlite3.Connection, invoice_id: int, reason: str, mode: str) -> dict:
+    invoice = _invoice_row(conn, invoice_id)
+    if invoice["status"] == "posted":
+        return agent_result(conn, invoice_id)
+    _agent_case(conn, invoice_id, reason)
+    return _agent_state(conn, invoice_id, "blocked", reason, mode)
+
+
+def process_agent_proposal(conn: sqlite3.Connection, invoice_id: int, proposal: AgentProposal, mode: str, expected: str) -> dict:
+    context = agent_context(conn, invoice_id)
+    if context_fingerprint(context) != expected:
+        raise HTTPException(409, "Case context changed during analysis; rerun the agent")
+    invoice = context["invoice"]
+    if invoice["status"] == "posted":
+        return agent_result(conn, invoice_id)
+    if any(c["assignee"] == "accountant" for c in invoice["cases"] if c["status"] != "resolved"):
+        return block_agent(conn, invoice_id, "The accountant has taken over this case", mode)
+    if any(q["status"] == "open" for q in context["questions"]):
+        return _agent_state(conn, invoice_id, "waiting_for_client", "Waiting for the linked client answer", mode)
+    if context["policy"] != DEMO_POLICY or "-DEMO-" not in invoice["ksef_number"]:
+        return block_agent(conn, invoice_id, "No reviewed policy for this document; only synthetic demo invoices are supported", mode)
+    try:
+        issued = date.fromisoformat(invoice["issue_date"])
+        if not date.fromisoformat(DEMO_POLICY["valid_from"]) <= issued <= date.fromisoformat(DEMO_POLICY["valid_until"]):
+            raise ValueError
+    except ValueError:
+        return block_agent(conn, invoice_id, "Invoice date is outside the synthetic policy period", mode)
+    category = invoice_category(invoice["description"])
+    if proposal.action == "block" or category == "unsupported" or proposal.category != category:
+        return block_agent(conn, invoice_id, "Classification is unsupported or conflicts with the document", mode)
+
+    conditions = {
+        "category": category, "policy_version": DEMO_POLICY["version"], "chart_version": DEMO_POLICY["chart_version"],
+        "valid_from": DEMO_POLICY["valid_from"], "valid_until": DEMO_POLICY["valid_until"],
+    }
+    if not invoice["cases"]:
+        for match in context["precedents"]:
+            precedent = match["precedent"]
+            required = {**conditions}
+            if category == "vehicle_fuel":
+                required["vehicle_plate"] = invoice["vehicle_plate"]
+            if match["applicable"] and all(precedent["conditions"].get(k) == v for k, v in required.items()):
+                create_posting(conn, invoice_id, PostingIn(
+                    account=precedent["account"], vat_deduction_percent=precedent["vat_deduction_percent"],
+                    rationale="Reused a matching synthetic decision with current policy conditions", confidence=1,
+                    actor="invoice_agent", source="precedent", precedent_id=precedent["id"],
+                ))
+                return _agent_state(conn, invoice_id, "completed", "Applied a matching conditional precedent", mode)
+
+    if category == "vehicle_fuel":
+        plate = invoice["vehicle_plate"]
+        vehicle = next((v for v in context["client"]["fleet"] if v["plate"] == plate), None)
+        if not plate:
+            return block_agent(conn, invoice_id, "No vehicle registration was extracted from the invoice", mode)
+        if vehicle is None:
+            case = _agent_case(conn, invoice_id, f"Vehicle {plate} is outside the known fleet")
+            question = ask_question(conn, case["id"], QuestionIn(
+                text=f"Fuel invoice for {plate}: confirm the vehicle, its usage and the business purpose of this purchase.",
+            ))
+            log_event(conn, "regulations_agent", "context_request", "Vehicle context requested", invoice_id, case["id"], {
+                "question_id": question["id"], "missing_context_type": "vehicle_usage",
+                "answer_schema": {"required": ["vehicle_plate", "usage", "business_purpose"]},
+            })
+            return _agent_state(conn, invoice_id, "waiting_for_client", "Vehicle context is missing", mode)
+        if vehicle["usage"] != "mixed":
+            return block_agent(conn, invoice_id, "Only the synthetic mixed-use fuel rule is supported; additional evidence is required", mode)
+        conditions.update(vehicle_plate=plate, vehicle_usage="mixed")
+
+    account = DEMO_POLICY["fuel_account"] if category == "vehicle_fuel" else DEMO_POLICY["it_account"]
+    basis = json.dumps({"policy": DEMO_POLICY, "category": category}, sort_keys=True)
+    create_posting(conn, invoice_id, PostingIn(
+        account=account, vat_deduction_percent=50 if category == "vehicle_fuel" else 100,
+        rationale=f"Synthetic fixture policy {DEMO_POLICY['version']}: {category}. {proposal.rationale}",
+        confidence=1, actor="regulations_agent" if invoice["cases"] or category == "vehicle_fuel" else "invoice_agent",
+        source="regulation" if invoice["cases"] or category == "vehicle_fuel" else "rule",
+        legal_basis=basis, reusable=True, conditions=conditions,
+    ))
+    return _agent_state(conn, invoice_id, "completed", "Synthetic decision recorded with evidence and conditions", mode)
+
+
+def answer_agent_question(conn: sqlite3.Connection, question_id: int, body: ContextAnswerIn) -> dict:
+    question = conn.execute("SELECT * FROM questions WHERE id = ?", (question_id,)).fetchone()
+    if question is None:
+        raise _not_found("Question", question_id)
+    case = _case_row(conn, question["case_id"])
+    invoice_id = case["invoice_id"]
+    data = body.model_dump(exclude_none=True)
+    data["vehicle_plate"] = normalize_plate(data.get("vehicle_plate"))
+    canonical = json.dumps(data, sort_keys=True)
+    if question["status"] == "answered":
+        if question["answer"] != canonical:
+            raise HTTPException(409, "A different answer is already recorded; use the correction workflow")
+        return {"invoice_id": invoice_id, "complete": True, "replayed": True}
+    _open_case_row(conn, case["id"])
+    request = conn.execute(
+        "SELECT data FROM events WHERE type = 'context_request' AND case_id = ? ORDER BY id DESC", (case["id"],),
+    ).fetchall()
+    if not any(json.loads(r[0]).get("question_id") == question_id for r in request):
+        raise HTTPException(409, "This question has no supported structured answer contract")
+    missing = [field for field in ("vehicle_plate", "usage", "business_purpose") if not data.get(field)]
+    if missing:
+        log_event(conn, "client_agent", "context_answer_incomplete", "Client answer needs more facts", invoice_id, case["id"], {"question_id": question_id, "missing": missing})
+        return {"invoice_id": invoice_id, "complete": False, "missing": missing}
+    invoice = _invoice_row(conn, invoice_id)
+    if data["vehicle_plate"] != invoice["vehicle_plate"]:
+        raise HTTPException(409, "The answer concerns a different vehicle")
+    if case["assignee"] == "accountant":
+        raise HTTPException(409, "The accountant has taken over this case")
+    answer_question(conn, question_id, AnswerIn(answer=canonical))
+    add_vehicle(conn, VehicleIn(plate=data["vehicle_plate"], model=data.get("vehicle_model") or "Client-declared vehicle", usage=data["usage"]))
+    add_fact(conn, FactIn(key=f"vehicle_purpose:{data['vehicle_plate']}", value=data["business_purpose"]))
+    return {"invoice_id": invoice_id, "complete": True, "replayed": False}
+
+
+def agent_questions(conn: sqlite3.Connection) -> list[dict]:
+    result = []
+    for question in list_questions(conn, "open"):
+        case = _case_row(conn, question["case_id"])
+        invoice = _invoice_row(conn, case["invoice_id"])
+        result.append({**question, "invoice_id": invoice["id"], "vehicle_plate": invoice["vehicle_plate"],
+                       "answer_schema": {"required": ["vehicle_plate", "usage", "business_purpose"]}})
+    return result
+
+
+def submit_agent_document(conn: sqlite3.Connection, body: InvoiceIn) -> dict:
+    row = conn.execute("SELECT id FROM invoices WHERE ksef_number = ?", (body.ksef_number,)).fetchone()
+    if row:
+        existing = _invoice_row(conn, row[0])
+        values = body.model_dump()
+        values["vehicle_plate"] = normalize_plate(body.vehicle_plate)
+        for key, value in values.items():
+            current = Decimal(existing[key]) if key in ("net", "vat", "gross") else existing[key]
+            if current != value:
+                raise HTTPException(409, "The document identity already exists with different content")
+        return dict(existing)
+    return insert_invoice(conn, body)

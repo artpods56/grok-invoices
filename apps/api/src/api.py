@@ -3,12 +3,13 @@ import os
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 
-from apps.api.src import seed, store
+from apps.api.src import agents, seed, store
 from apps.api.src.db import read, transaction
 from apps.api.src.schemas import (
     Account, AnswerIn, Case, CaseDetail, CaseStatus, Client, CorrectionIn, EscalationIn, Event, FactIn, Invoice,
     InvoiceDetail, InvoiceIn, InvoiceStatus, Posting, PostingIn, PrecedentMatch, Question, QuestionIn, QuestionStatus,
     VehicleIn,
+    AgentRunIn, ContextAnswerIn,
 )
 
 
@@ -148,3 +149,26 @@ def reset_demo() -> None:
     """Restore the seed data so the demo can run again."""
     with transaction() as conn:
         seed.reset(conn)
+
+
+@router.post("/agents/setup-demo", tags=["agents"])
+def setup_agent_demo():
+    """Explicitly install the synthetic policy without rebuilding an existing database."""
+    with transaction() as conn:
+        return store.setup_demo_policy(conn)
+
+
+@router.post("/agents/run", tags=["agents"])
+def run_agent_workflow(body: AgentRunIn):
+    return agents.run_agents(body)
+
+
+@router.get("/agents/status", tags=["agents"])
+def agent_status():
+    with read() as conn:
+        return [store.agent_result(conn, i["id"]) for i in store.list_invoices(conn, None)]
+
+
+@router.post("/agents/questions/{question_id}/answer", tags=["agents"])
+def answer_agent_question(question_id: int, body: ContextAnswerIn, mode: str = Query(default="demo", pattern="^(demo|xai)$")):
+    return agents.answer_and_resume(question_id, body, mode)
