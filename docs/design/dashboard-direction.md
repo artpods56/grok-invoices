@@ -29,7 +29,8 @@ The dashboard is a supporting inspection surface. The primary client interface r
 - The image preserves the selected reference's visual direction, with Grok Invoices branding, English copy, and four synthetic invoice rows. It is an adaptation, not a verified pixel-exact reproduction.
 - The mockup uses an additional blocked example to demonstrate all three statuses; it does not replace the regression scenario in the project context.
 - Visual check: summary counts match the table (2 completed, 1 waiting for client, 1 blocked); the unknown-vehicle invoice is PLN 246.00. No external integration was exercised.
-- Dashboard implementation and external integrations: not implemented by this design task.
+- Dashboard implementation: React interface, synthetic workflow, and read-only platform adapter are committed. The owner subsequently selected Next.js + Tailwind and a separate web container; migration and integration acceptance are in progress.
+- Live KSeF, chat and phone connections are not established by the dashboard. Platform mode reads backend demo records; synthetic mode is a separate local walkthrough.
 
 ## Working agreement
 
