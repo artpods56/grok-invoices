@@ -35,6 +35,7 @@ Code lives in `apps/api/src/grok_invoices`. Dependencies only point inward, and
 - `service_layer/commands.py`, `views.py`: what services take and return.
 - `service_layer/unit_of_work.py`: the SQLite transaction and repositories.
 - `entrypoints/http.py`: FastAPI app, routes under `/api`, the API key check, `/health`.
+- `entrypoints/mcp_agents.py`: FastMCP servers for the invoice and regulations bots, with the actor fixed per server.
 - `ksef.py`: KSeF TEST calls through ksef2.
 - `seed.py`: demo data and fixture invoices.
 - `settings.py`: configuration from the environment.
@@ -58,6 +59,8 @@ rolls back to the previous one.
 - Use ksef2 directly. `KsefInvoice` is the invoice model, read through `Invoice.document`.
   Don't write providers, adapters or mappers around the SDK, and don't re-model its fields.
   Docs: https://docs.stackinghq.com/ksef2/sdk/getting-started/overview/
+- Build MCP servers with FastMCP (https://gofastmcp.com), stateless with JSON responses, because
+  Cloudflare cuts idle connections.
 - Add an abstraction only for a second real implementation. There are no abstract repositories
   or fake units of work, because SQLite is the only store and tests run on it in milliseconds.
   Something tests must not trigger, like a model or phone call, gets a plain function or
