@@ -16,6 +16,15 @@ uv run uvicorn grok_invoices.entrypoints.http:app --reload
 The server runs at http://127.0.0.1:8000, with interactive API docs at `/docs`.
 See [AGENTS.md](AGENTS.md) for the architecture and conventions.
 
+## Agent MCP servers
+
+Two Grok Bots connect over stateless HTTP. Each server checks its own invite on every request. An empty setting refuses the connection.
+
+- Invoice agent: `/agents/invoices/mcp`, setting `INVOICE_AGENT_TOKEN`
+- Regulations agent: `/agents/regulations/mcp`, setting `REGULATIONS_AGENT_TOKEN`
+
+Send the token as `?invite=` or the `X-Invite` header. Prefer the header, so the token stays out of the URL. Each token opens only its own server.
+
 ## Deployment
 
 Every push to `main` deploys to https://grok.stackinghq.com through
