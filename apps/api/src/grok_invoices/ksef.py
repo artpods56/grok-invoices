@@ -25,15 +25,23 @@ def _with_ksef[T](call: Callable[[Client], T]) -> T:
         raise KsefUnavailable(f"KSeF request failed: {error}") from error
 
 
-def fetch_new(nip: str, since: datetime, known: Collection[str]) -> list[ReceivedDocument]:
+def fetch_new(
+    nip: str, since: datetime, known: Collection[str], *, ksef_token: str | None = None,
+) -> list[ReceivedDocument]:
     """Download purchase invoices in permanent storage since `since`, skipping `known` KSeF numbers.
 
     Permanent storage matters: an invoice accepted on the seller's side may not be in the
     buyer's inbox yet. Metadata has no line items or plate, so each invoice is downloaded.
+
+    A stored KSeF token logs in with `with_token`. Without one, the TEST certificate is used.
+    The caller decrypts the token before this call. This function reaches the network.
     """
 
     def fetch(client: Client) -> list[ReceivedDocument]:
-        auth = client.authentication.with_test_certificate(nip=nip)
+        if ksef_token:
+            auth = client.authentication.with_token(ksef_token=ksef_token, nip=nip)
+        else:
+            auth = client.authentication.with_test_certificate(nip=nip)
         filters = InvoicesFilter.for_buyer(date_from=since, date_type="permanent_storage")
         params = InvoiceMetadataParams(page_size=100, sort_order="asc")
         return [
@@ -43,6 +51,11 @@ def fetch_new(nip: str, since: datetime, known: Collection[str]) -> list[Receive
         ]
 
     return _with_ksef(fetch)
+
+
+def verify_token(nip: str, ksef_token: str) -> None:
+    """Log in once, so a bad token is refused when it's configured and not at a later fetch."""
+    _with_ksef(lambda client: client.authentication.with_token(ksef_token=ksef_token, nip=nip))
 
 
 def build_invoice_xml(

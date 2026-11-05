@@ -8,18 +8,20 @@ from datetime import UTC, datetime
 from typing import Literal
 
 from grok_invoices import ksef, seed
-from grok_invoices.domain import rules
+from grok_invoices.domain import regulations, rules
 from grok_invoices.domain.errors import Conflict
 from grok_invoices.domain.models import (
-    Account, Actor, Case, Event, EventType, Fact, Invoice, Posting, Question, QuestionStatus, ReceivedDocument,
-    Vehicle,
+    Account, Actor, Case, ClientDocument, Event, EventType, Fact, Invoice, KsefToken, Posting, Question,
+    QuestionStatus, ReceivedDocument, Vehicle,
 )
 from grok_invoices.service_layer.commands import (
     AddFact, AnswerQuestion, AskClient, CorrectPosting, Escalate, PostInvoice, SaveVehicle,
 )
+from grok_invoices.service_layer.secrets import decrypt_secret, encrypt_secret
 from grok_invoices.service_layer.unit_of_work import UnitOfWork, init_store
 from grok_invoices.service_layer.views import (
-    CaseDetail, ClientProfile, InvoiceDetail, InvoiceSummary, IssuedInvoice, PrecedentMatch,
+    CaseDetail, ClientProfile, ClientStatus, DocumentContent, InvoiceDetail, InvoiceSummary, IssuedInvoice, KsefConfigured,
+    OpenQuestion, PrecedentMatch, StoredDocument,
 )
 
 KsefSource = Literal["fixtures", "test"]
@@ -77,6 +79,10 @@ def list_accounts() -> list[Account]:
     return get_client().accounts
 
 
+def search_regulations(query: str) -> regulations.SearchResult:
+    return regulations.search(query)
+
+
 def add_fact(command: AddFact) -> ClientProfile:
     with UnitOfWork() as uow:
         client = uow.client
@@ -94,6 +100,82 @@ def save_vehicle(command: SaveVehicle) -> ClientProfile:
             plate=command.plate,
         )
         return ClientProfile.model_validate(client)
+
+
+def start_onboarding(nip: str, company_name: str) -> ClientProfile:
+    """Register the company behind this MCP invite. The NIP checksum is checked first."""
+    nip, company_name = rules.onboarding_identity(nip, company_name)
+    with UnitOfWork() as uow:
+        client = uow.client
+        client.nip = nip
+        client.name = company_name
+        client.onboarded_at = _now()
+        _log(
+            uow, "client_agent", "onboarding_started",
+            f"Rejestracja klienta: {company_name}, NIP {nip}", nip=nip,
+        )
+        return ClientProfile.model_validate(client)
+
+
+def configure_ksef(ksef_token: str) -> KsefConfigured:
+    """Encrypt the KSeF token and keep the ciphertext plus the last four characters.
+
+    The plaintext is encrypted before the transaction opens, and it is not written
+    into the event.
+    """
+    token = rules.require_ksef_token(ksef_token)
+    ciphertext = encrypt_secret(token)
+    last_four = token[-4:]
+    with UnitOfWork(write=False) as uow:
+        nip = uow.client.nip
+    ksef.verify_token(nip, token)
+    with UnitOfWork() as uow:
+        stored = uow.ksef_tokens.all()
+        if stored:
+            current = stored[-1]
+            current.ciphertext = ciphertext
+            current.last_four = last_four
+            current.configured_at = _now()
+        else:
+            uow.ksef_tokens.add(KsefToken(ciphertext=ciphertext, last_four=last_four, configured_at=_now()))
+        _log(uow, "client_agent", "ksef_token_configured", "Skonfigurowano token KSeF")
+        return KsefConfigured(last_four=last_four)
+
+
+def submit_document(name: str, content_text: str) -> StoredDocument:
+    name, content_text = rules.client_document(name, content_text)
+    with UnitOfWork() as uow:
+        document = uow.documents.add(ClientDocument(name=name, content_text=content_text, created_at=_now()))
+        _log(uow, "client_agent", "document_submitted", f"Dokument od klienta: {name}", document_id=document.id, name=name)
+        return StoredDocument(id=document.id, name=document.name)
+
+
+def list_documents() -> list[StoredDocument]:
+    with UnitOfWork(write=False) as uow:
+        return [StoredDocument.model_validate(document) for document in uow.documents.all()]
+
+
+def get_document(document_id: int) -> DocumentContent:
+    with UnitOfWork(write=False) as uow:
+        return DocumentContent.model_validate(uow.documents.require(document_id))
+
+
+def get_status() -> ClientStatus:
+    with UnitOfWork(write=False) as uow:
+        client = uow.client
+        tokens = uow.ksef_tokens.all()
+        counts = {status: 0 for status in ("received", "escalated", "posted")}
+        for invoice in uow.invoices.all():
+            counts[invoice.status] += 1
+        return ClientStatus(
+            onboarded=client.onboarded_at is not None,
+            company_name=client.name,
+            nip=client.nip,
+            ksef_token_configured=bool(tokens),
+            ksef_token_last_four=tokens[-1].last_four if tokens else None,
+            invoices_by_status=counts,
+            open_questions=sum(question.status == "open" for question in uow.questions.all()),
+        )
 
 
 # --- Invoices ---
@@ -123,8 +205,14 @@ def sync_ksef(source: KsefSource = "fixtures") -> list[InvoiceSummary]:
         return ingest_documents(seed.fixture_inbox())
     with UnitOfWork(write=False) as uow:
         client = uow.client
+        nip = client.nip
+        since = client.ksef_since
         known = {invoice.ksef_number for invoice in uow.invoices.all()}
-    return ingest_documents(ksef.fetch_new(client.nip, client.ksef_since, known))
+        stored = uow.ksef_tokens.all()
+        ciphertext = stored[-1].ciphertext if stored else None
+    # Decrypt here, not inside the unit of work. The download below is a network call.
+    token = decrypt_secret(ciphertext) if ciphertext is not None else None
+    return ingest_documents(ksef.fetch_new(nip, since, known, ksef_token=token))
 
 
 def issue_demo_invoice() -> IssuedInvoice:
@@ -156,6 +244,11 @@ def get_invoice(invoice_id: int) -> InvoiceDetail:
 def get_invoice_xml(invoice_id: int) -> str:
     with UnitOfWork(write=False) as uow:
         return uow.invoices.require(invoice_id).source_xml
+
+
+def get_posting(posting_id: int) -> Posting:
+    with UnitOfWork(write=False) as uow:
+        return uow.postings.require(posting_id)
 
 
 def search_precedents(invoice_id: int) -> list[PrecedentMatch]:
@@ -288,6 +381,12 @@ def list_cases(status: str | None = None) -> list[Case]:
         return [c for c in uow.cases.all() if status is None or c.status == status]
 
 
+def list_open_cases() -> list[CaseDetail]:
+    """Cases not yet resolved, with the invoice summary and every question asked so far."""
+    with UnitOfWork(write=False) as uow:
+        return [_case_detail(uow, case) for case in uow.cases.all() if case.is_open]
+
+
 def get_case(case_id: int) -> CaseDetail:
     with UnitOfWork(write=False) as uow:
         return _case_detail(uow, uow.cases.require(case_id))
@@ -305,6 +404,27 @@ def ask_client(case_id: int, command: AskClient) -> Question:
 def list_questions(status: QuestionStatus | None = None) -> list[Question]:
     with UnitOfWork(write=False) as uow:
         return [q for q in uow.questions.all() if status is None or q.status == status]
+
+
+def list_open_questions() -> list[OpenQuestion]:
+    """Open questions with the invoice plate, seller, gross amount and KSeF number."""
+    with UnitOfWork(write=False) as uow:
+        found = []
+        for question in uow.questions.all():
+            if question.status != "open":
+                continue
+            case = uow.cases.require(question.case_id)
+            summary = InvoiceSummary.model_validate(uow.invoices.require(case.invoice_id))
+            found.append(OpenQuestion(
+                id=question.id,
+                case_id=question.case_id,
+                text=question.text,
+                vehicle_plate=summary.vehicle_plate,
+                seller_name=summary.seller_name,
+                gross=summary.gross,
+                ksef_number=summary.ksef_number,
+            ))
+        return found
 
 
 def answer_question(question_id: int, command: AnswerQuestion) -> Question:

@@ -16,6 +16,15 @@ uv run uvicorn grok_invoices.entrypoints.http:app --reload
 The server runs at http://127.0.0.1:8000, with interactive API docs at `/docs`.
 See [AGENTS.md](AGENTS.md) for the architecture and conventions.
 
+## Agent MCP servers
+
+Two Grok Bots connect over stateless HTTP. Each server checks its own invite on every request. An empty setting refuses the connection.
+
+- Invoice agent: `/agents/invoices/mcp`, setting `INVOICE_AGENT_TOKEN`
+- Regulations agent: `/agents/regulations/mcp`, setting `REGULATIONS_AGENT_TOKEN`
+
+Send the token as `?invite=` or the `X-Invite` header. Prefer the header, so the token stays out of the URL. Each token opens only its own server.
+
 ## Deployment
 
 Every push to `main` deploys to https://grok.stackinghq.com through
@@ -43,6 +52,23 @@ on the server; locally, leave it unset to skip the check.
 
 Bumping `STORE_VERSION` in `unit_of_work.py` rebuilds the database from the seed on the next
 start, which discards existing data.
+
+## Connect a client agent
+
+Each client gets the same Grok Bot instructions and its own MCP link. The instructions
+to paste into the bot are in `apps/api/client-agent-template.md`. Connecting with a
+valid invite registers that client.
+
+The server needs two settings in `/srv/grok-invoices/.env`:
+
+- `CLIENT_INVITE_TOKEN`, the secret the bot sends as `?invite=` or the `X-Invite` header.
+- `SECRET_ENCRYPTION_KEY`, a Fernet key for the KSeF token. Generate one with
+  `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+
+Point the bot at `https://grok.stackinghq.com/agents/client/mcp?invite=<token>`.
+The platform API key is not accepted on this endpoint. A missing setting, a missing
+invite, or a wrong invite is refused. The KSeF token is encrypted at rest. The API
+returns only its last four characters, and no route returns a stored document.
 
 ## Project notes
 

@@ -60,3 +60,45 @@ class PrecedentMatch(View):
 
 class IssuedInvoice(View):
     ksef_number: str
+
+
+class OpenQuestion(View):
+    """An unanswered client question, with the invoice facts the client agent reads out."""
+
+    id: int
+    case_id: int
+    text: str
+    vehicle_plate: str | None
+    seller_name: str
+    gross: Decimal
+    ksef_number: str
+
+
+class ClientStatus(View):
+    """Onboarding progress. The KSeF token itself is never included, only whether it is stored."""
+
+    onboarded: bool
+    company_name: str
+    nip: str
+    ksef_token_configured: bool
+    ksef_token_last_four: str | None = None
+    invoices_by_status: dict[str, int]
+    open_questions: int
+
+
+class KsefConfigured(View):
+    configured: bool = True
+    last_four: str
+
+
+class StoredDocument(View):
+    """A stored document. The text stays in the entity and is not part of this view."""
+
+    id: int
+    name: str
+
+
+class DocumentContent(StoredDocument):
+    """For the bots' MCP servers only. Reads under /api are public, so no route returns this."""
+
+    content_text: str

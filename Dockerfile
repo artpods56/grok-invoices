@@ -24,4 +24,5 @@ USER app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "grok_invoices.entrypoints.http:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+# Bots authenticate with a token in the URL, so request URLs must stay out of logs.
+CMD ["uvicorn", "grok_invoices.entrypoints.http:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*", "--no-access-log"]
