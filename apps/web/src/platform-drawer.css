@@ -1,0 +1,25 @@
+.platform-overlay { position: fixed; inset: 0; z-index: 100; display: flex; justify-content: flex-end; background: rgb(24 28 34 / 22%); overscroll-behavior: contain; }
+.platform-drawer { box-sizing: border-box; display: flex; flex-direction: column; width: min(100%, 520px); height: 100%; height: 100dvh; background: #fff; color: #22252b; box-shadow: -8px 0 40px rgb(23 28 36 / 10%); font-family: Inter, sans-serif; font-size: 13px; line-height: 1.55; }
+.platform-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid #ebebee; flex-shrink: 0; }
+.platform-header h2 { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -.5px; }
+.platform-eyebrow { margin: 0 0 2px; color: #646871; font-size: 12px; }
+.platform-drawer button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; border: 1px solid #e5e5e9; border-radius: 8px; background: #fafafa; padding: 8px 12px; color: #33363b; font: inherit; cursor: pointer; }
+.platform-drawer button span { font-size: 21px; line-height: 1; }
+.platform-drawer button:focus-visible, .platform-drawer:focus-visible { outline: 2px solid #295bd9; outline-offset: 3px; }
+.platform-content { overflow-y: auto; overscroll-behavior: contain; padding: 20px 24px 32px; }
+.platform-notice { margin: 0 0 20px; padding: 12px 14px; border: 1px solid #dbe6f7; border-radius: 8px; background: #f4f8ff; color: #3d506e; font-size: 12px; }
+.platform-section { padding: 18px 0; border-top: 1px solid #ededf0; }
+.platform-section h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+.platform-section h4 { margin: 0; font-size: 13px; font-weight: 600; }
+.platform-section p { margin: 8px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.platform-facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 20px; margin: 0; }
+.platform-facts dt, .platform-muted, .platform-timeline time { color: #646871; font-size: 12px; }
+.platform-facts dd { margin: 3px 0 0; overflow-wrap: anywhere; }
+.platform-error { color: #a62430; overflow-wrap: anywhere; }
+.platform-record + .platform-record { margin-top: 18px; padding-top: 18px; border-top: 1px solid #ededf0; }
+.platform-record > h4 { margin-bottom: 10px; }
+.platform-question { margin-top: 14px; padding: 12px; background: #f7f8fa; border-radius: 8px; }
+.platform-timeline { list-style: none; padding: 0 0 0 12px; margin: 18px 0 0 4px; border-left: 1px solid #e0e3e9; }
+.platform-timeline li { position: relative; padding: 0 0 18px 9px; }
+.platform-timeline li::before { content: ''; position: absolute; left: -16px; top: 5px; width: 6px; height: 6px; border-radius: 50%; border: 1px solid #b8c8e4; background: #edf3ff; }
+@media (max-width: 540px) { .platform-header { padding: 16px; } .platform-content { padding: 16px 16px 28px; } }
